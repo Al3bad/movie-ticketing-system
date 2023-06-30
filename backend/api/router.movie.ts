@@ -1,20 +1,8 @@
 import { Router } from "express";
+import * as controller from "./controller.movie";
 
 const router = Router();
 
-router.get("/help", (req, res) => {
-  res.json({
-    routes: [
-      {
-        endpoint: `${req.baseUrl}/`,
-        description: "Get all movies",
-      },
-      {
-        endpoint: `${req.baseUrl}/<movie-id>`,
-        description: "Get movie info by id",
-      },
-    ],
-  });
-});
+router.get("/help", controller.help);
 
 export default router;

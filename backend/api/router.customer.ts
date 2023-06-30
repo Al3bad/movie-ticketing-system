@@ -1,20 +1,8 @@
 import { Router } from "express";
+import * as controller from "./controller.customer";
 
 const router = Router();
 
-router.get("/help", (req, res) => {
-  res.json({
-    routes: [
-      {
-        endpoint: `${req.baseUrl}/`,
-        description: "Get all customers",
-      },
-      {
-        endpoint: `${req.baseUrl}/<customer-id>`,
-        description: "Get customer info by id",
-      },
-    ],
-  });
-});
+router.get("/help", controller.help);
 
 export default router;
