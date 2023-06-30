@@ -1,0 +1,23 @@
+.dropdown {
+    width: 100%;
+    font-size: var(--font-size);
+}
+
+.dropdown label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.dropdown select {
+    height: var(--input-height);
+    margin-bottom: 8px;
+    border: 2px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .dropdown {
+        width: 200px;
+    }
+}
