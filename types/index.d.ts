@@ -7,20 +7,36 @@
 type Modify<T, R> = Omit<T, keyof R> & R;
 
 // ==============================================
-// --> Booking types
+// --> Movie types
 // ==============================================
 
-type NewBooking = {
-  email: string;
-  name: string;
-  type: string;
-  movie: string;
-  ticket: Ticket[];
+type NewMovie = {
+  title: string;
+  seatsAvailable: number;
+  isReleased: boolean;
 };
 
-type Booking = NewBooking & {
+type Movie = NewMovie & {
   id: number;
 };
+
+// ==============================================
+// --> Ticket types
+// ==============================================
+
+type NewTicket = {
+  type: string;
+};
+
+type Ticket = NewTicket & {
+  qty: number;
+};
+
+type GroupTicket = NewTicket & {
+  components: Ticket[];
+};
+
+type NewGroupTicket = GroupTicket;
 
 // ==============================================
 // --> Customer types
@@ -50,32 +66,17 @@ type StepCustomer = Modify<
 >;
 
 // ==============================================
-// --> Movie types
+// --> Booking types
 // ==============================================
 
-type Movie = {
+type NewBooking = {
+  email: string;
+  name: string;
+  type: string;
+  movie: string;
+  ticket: Ticket[];
+};
+
+type Booking = NewBooking & {
   id: number;
-  title: string;
-  seatsAvailable: number;
-  isReleased: boolean;
 };
-
-// ==============================================
-// --> Ticket types
-// ==============================================
-
-type Ticket = {
-  type: string;
-  qty: number;
-};
-
-type NewTicket = {
-  type: string;
-};
-
-type GroupTicket = {
-  type: string;
-  components: Ticket[];
-};
-
-type NewGroupTicket = GroupTicket;
