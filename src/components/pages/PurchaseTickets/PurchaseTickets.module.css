@@ -1,5 +1,10 @@
 .purchase-tickets {
     font-size: var(--font-size);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .purchase-tickets__block {
@@ -7,13 +12,9 @@
     margin: 20px;
     height: 100%;
     width: 50%;
+    padding: 2% 1%;
 }
 
-@media (min-width: 768px) {
-    .purchase-tickets {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 400px;
-    }
+.purchase-tickets__title {
+    margin-bottom: 20px;
 }

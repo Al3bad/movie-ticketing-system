@@ -17,9 +17,21 @@ export default function Icon({ name, color }: Props) {
     case "check":
       return (
         <svg {...commonAttr} color={color || defaultColor}>
-          <g id="check-lg">
-          <path id="Vector" d="M5.99998 11.28L3.21998 8.49999L2.27332 9.43999L5.99998 13.1667L14 5.16665L13.06 4.22665L5.99998 11.28Z" fill="#657486"/>
-          </g>
+          <path
+            id="Vector"
+            d="M5.99998 11.28L3.21998 8.49999L2.27332 9.43999L5.99998 13.1667L14 5.16665L13.06 4.22665L5.99998 11.28Z"
+            fill="#657486"
+          />
+        </svg>
+      );
+    case "add":
+      return (
+        <svg {...commonAttr} color={color || defaultColor}>
+          <path
+            id="Vector"
+            d="M16.3334 10.8334H11.3334V15.8334H9.66669V10.8334H4.66669V9.16669H9.66669V4.16669H11.3334V9.16669H16.3334V10.8334Z"
+            fill="#A5B4C5"
+          />
         </svg>
       );
     case "arrow-down":
