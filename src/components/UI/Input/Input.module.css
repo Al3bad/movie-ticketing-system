@@ -1,0 +1,31 @@
+.input-field {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.input-field.input-field--multi-inputs {
+    margin-bottom: 0;
+}
+
+.input-field.input-field--multi-inputs input {
+    border: none;
+    border-radius: var(--input-border-radius) var(--input-border-radius);
+}
+
+.input-field label,
+.input-field input {
+    font-size: var(--font-size);
+}
+
+.input-field label {
+    display: block;
+}
+
+.input-field input {
+    height: var(--input-height);
+    border: 2px solid var(--input-border-color);
+    padding: 5px;
+    width: 100%;
+    border-radius: var(--input-border-radius);
+    background-color: rgba(249, 250, 252, 1);
+}

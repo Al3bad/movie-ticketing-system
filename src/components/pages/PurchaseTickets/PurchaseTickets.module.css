@@ -1,0 +1,19 @@
+.purchase-tickets {
+    font-size: var(--font-size);
+}
+
+.purchase-tickets__block {
+    background-color:rgba(231, 236, 244, 1);
+    margin: 20px;
+    height: 100%;
+    width: 50%;
+}
+
+@media (min-width: 768px) {
+    .purchase-tickets {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 400px;
+    }
+}

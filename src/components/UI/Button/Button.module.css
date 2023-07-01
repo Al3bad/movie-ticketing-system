@@ -3,6 +3,15 @@
     border-radius: var(--input-border-radius);
     height: var(--input-height);
     font-size: var(--font-size);
+    box-shadow: none;
+    border: none;
+    background-color: rgba(249, 250, 252, 1);
+}
+
+.button.button--multi-inputs button {
+    border: none;
+    border-radius: none;
+    cursor: pointer;
 }
 
 .button--primary {
@@ -12,13 +21,14 @@
 
 .button--primary:hover {
     background-color: rgba(41, 82, 176, 1);
+    cursor: pointer;
 }
 
 .button--primary:disabled {
     background-color: rgba(160, 182, 231, 1);
 }
 
-.secondary {
+.button--secondary {
     background-color: var(--secondary);
     border: 1px solid rgba(30, 38, 47, 1);
     color: rgba(30, 38, 47, 1);
@@ -28,16 +38,11 @@
     background-color: rgba(231, 236, 244, 1);
     color: rgba(66, 78, 93, 1);
     border: 1px solid rgba(66, 78, 93, 1);
+    cursor: pointer;
 }
 
 .button--secondary:disabled {
     background-color: rgba(231, 236, 244, 1);
     color: rgba(165, 180, 197, 1);
     border: 1px solid rgba(165, 180, 197, 1);
-}
-
-@media (min-width: 768px) {
-    .button {
-        width: 200px;
-    }
 }
