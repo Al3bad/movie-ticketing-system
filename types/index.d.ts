@@ -74,7 +74,7 @@ type NewBooking = {
   name: string;
   type: string;
   movie: string;
-  ticket: Ticket[];
+  tickets: Ticket[];
 };
 
 type Booking = NewBooking & {

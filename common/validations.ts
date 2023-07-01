@@ -60,7 +60,7 @@ export const NewBookingSchema = z.object({
   name: z.string(),
   type: z.enum(["Normal", "Flat", "Step"]),
   movie: z.string(),
-  ticket: z.array(TicketSchema),
+  tickets: z.array(TicketSchema),
 });
 
 export const BookingSchema = NewBookingSchema.extend({
