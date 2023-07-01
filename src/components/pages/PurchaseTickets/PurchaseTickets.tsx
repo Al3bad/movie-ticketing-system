@@ -74,9 +74,10 @@ const PurchaseTickets = () => {
           <MultipleInputs
             label="Ticket Types"
             options={DUMMY_TICKETS}
+            type="dropdown-w-input"
           />
 
-          <Button type="submit" classLabel="primary">
+          <Button type="submit" classLabels={["primary"]}>
             Purchase
           </Button>
         </form>

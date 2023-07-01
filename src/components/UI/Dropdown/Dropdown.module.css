@@ -4,13 +4,19 @@
     color: var(--text-color);
 }
 
-.dropdown.dropdown--multi-inputs {
+.dropdown.dropdown--multi-inputs-l,
+.dropdown.dropdown--multi-inputs-r {
     margin-bottom: 0;
 }
 
-.dropdown.dropdown--multi-inputs select {
+.dropdown.dropdown--multi-inputs-l select {
     border: none;
     border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
+}
+
+.dropdown.dropdown--multi-inputs-r select {
+    border: none;
+    border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
 }
 
 .dropdown label,
@@ -27,5 +33,10 @@
     border: 2px solid var(--input-border-color);
     border-radius: var(--input-border-radius);
     width: 100%;
-    background-color: rgba(249, 250, 252, 1);
+    background-color: var(--default-bg-color);
+    padding: var(--input-padding);
+}
+
+.dropdown select:focus {
+    outline: none;
 }

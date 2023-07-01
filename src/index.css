@@ -1,12 +1,14 @@
 /* CSS Variables */
 :root {
-  --input-height: 40px;
+  --input-height: 35px;
   --input-border-radius: 5px;
   --input-border-color: rgba(200, 211, 224, 1);
+  --input-padding: 5px;
   --text-color: rgba(30, 38, 47, 1);
   --font-size: 12px;
   --primary: rgba(52, 96, 197, 1);
   --secondary: rgba(249, 250, 252, 1);
+  --default-bg-color: rgba(249, 250, 252, 1);
 }
 
 /* Global Styling */

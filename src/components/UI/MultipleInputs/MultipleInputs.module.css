@@ -6,19 +6,19 @@
     margin-bottom: 8px;
 }
 
-.multi-inputs__lg-block,
-.multi-inputs__sm-block {
+.multi-inputs__lg,
+.multi-inputs__sm {
     margin-bottom: 0;
     border: 2px solid var(--input-border-color);
 }
 
-.multi-inputs__lg-block {
-    width: 75%;
+.multi-inputs__lg {
+    width: 80%;
     border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
     border-right: none;
 }
 
-.multi-inputs__sm-block {
-    width: 25%;
+.multi-inputs__sm {
+    width: 20%;
     border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
 }

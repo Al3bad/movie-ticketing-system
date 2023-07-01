@@ -3,7 +3,7 @@ import styles from "./Input.module.css";
 
 type InputProps = {
   label?: string;
-  classLabel: string;
+  classLabel?: string;
 };
 
 const Input: React.FC<InputProps> = ({ label, classLabel, ...inputAttr }) => {
