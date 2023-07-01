@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as controller from "./controller.ticket";
+import * as controller from "./movie.controller";
 
 const router = Router();
 

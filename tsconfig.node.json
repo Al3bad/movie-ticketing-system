@@ -12,7 +12,11 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/common/*": ["common/*"]
+    }
   },
   "include": ["vite.config.ts"]
 }
