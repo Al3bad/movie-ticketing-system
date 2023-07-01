@@ -2,6 +2,7 @@ import Button from "../../UI/Button/Button";
 import Dropdown from "../../UI/Dropdown/Dropdown";
 import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
 import Input from "../../UI/Input/Input";
+import Icon from "../../UI/Icon/Icon";
 import styles from "./PurchaseTickets.module.css";
 
 const PurchaseTickets = () => {
@@ -58,6 +59,7 @@ const PurchaseTickets = () => {
       <div
         className={`${styles["purchase-tickets"]} ${styles["purchase-tickets__block"]}`}
       >
+        <h2 className={styles["purchase-tickets__title"]}>Purchase Tickets</h2>
         <form onSubmit={purchaseTicketHandler}>
           <MultipleInputs
             label="Customer Email"
@@ -72,10 +74,14 @@ const PurchaseTickets = () => {
           <Dropdown label="Movie" options={DUMMY_MOVIES} />
 
           <MultipleInputs
-            label="Ticket Types"
+            label="Tickets"
             options={DUMMY_TICKETS}
             type="dropdown-w-input"
           />
+
+          <Button type="button" classLabels={["secondary", "secondary--icon"]}>
+            <Icon name="add"/>
+          </Button>
 
           <Button type="submit" classLabels={["primary"]}>
             Purchase

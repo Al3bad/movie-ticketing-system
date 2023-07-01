@@ -27,23 +27,31 @@
 
 .button--secondary {
     background-color: var(--secondary);
-    border: 1px solid rgba(30, 38, 47, 1);
+    border: 2px solid rgba(30, 38, 47, 1);
     color: rgba(30, 38, 47, 1);
 }
 
 .button--secondary:hover {
     background-color: rgba(231, 236, 244, 1);
     color: rgba(66, 78, 93, 1);
-    border: 1px solid rgba(66, 78, 93, 1);
+    border: 2px solid rgba(66, 78, 93, 1);
     transition: background-color ease-in-out 0.15s;
 }
 
 .button--secondary:disabled {
     background-color: rgba(231, 236, 244, 1);
     color: rgba(165, 180, 197, 1);
-    border: 1px solid rgba(165, 180, 197, 1);
+    border: 2px solid rgba(165, 180, 197, 1);
 }
 
+.button--secondary--icon {
+    border-color: rgba(200, 211, 224, 1);
+    margin-bottom: 8px;
+}
+
+.button--secondary--icon:hover {
+    border-color: rgba(200, 211, 224, 1);
+}
 /* Multiple Input Button */
 
 .button.button--multi-inputs-l.button--secondary,
