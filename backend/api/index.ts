@@ -1,8 +1,8 @@
 import { Router } from "express";
-import routerCustomer from "./router.customer";
-import routerMovie from "./router.movie";
-import routerTicket from "./router.ticket";
-import routerBooking from "./router.booking";
+import routerCustomer from "./customer.router";
+import routerMovie from "./movie.router";
+import routerTicket from "./ticket.router";
+import routerBooking from "./booking.router";
 const api = Router();
 
 // /api
