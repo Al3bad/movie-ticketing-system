@@ -42,6 +42,8 @@ type NewGroupTicket = GroupTicket;
 // --> Customer types
 // ==============================================
 
+type CustomerType = "Normal" | "Flat" | "Step";
+
 type NormalCustomer = {
   id?: number;
   name: string;
@@ -72,7 +74,7 @@ type StepCustomer = Modify<
 type NewBooking = {
   email: string;
   name: string;
-  type: string;
+  type: CustomerType;
   movie: string;
   tickets: Ticket[];
 };
