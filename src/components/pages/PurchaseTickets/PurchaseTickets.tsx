@@ -12,6 +12,7 @@ import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
 import Input from "../../UI/Input/Input";
 import Icon from "../../UI/Icon/Icon";
 import styles from "./PurchaseTickets.module.css";
+import { ZodStringCheck } from "zod";
 
 const PurchaseTickets = () => {
   // TO DO: NEED TO REMOVE ONCE BACKEND IS READY
@@ -67,16 +68,26 @@ const PurchaseTickets = () => {
   type Movie = {
     title: string;
   };
-  type Ticket = { name: string; price: number };
-  type SelectedTicket = {name: string, qty: number}
+  type Ticket = { type: string; price: number };
+  type SelectedTicket = { type: string; qty: number };
   type SelectedTickets = SelectedTicket[];
+  type Data = {
+    movies: Movie[],
+    ticketTypes: Ticket[],
+    customer: Customer,
+    selectedMovie: string,
+    selectedTicket: SelectedTicket
+  };
 
-  const [customer, setCustomer] = useState<Customer>(); // {email: "", name: "", type: ""}
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [ticketTypes, setTicketTypes] = useState<Ticket[]>([]);
+  const initialData = {
+    movies: [], 
+    ticketTypes: [], 
+    customer: {email: "", name: "", type: ""}, 
+    selectedMovie: "", 
+    selectedTicket: {type: "", qty: 0}
+  }
+  const [data, setData] = useState<Data>(initialData);
   const [isCustomerFetched, setIsCustomerFetched] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<string>();
-  const [selectedTicket, setSelectedTicket] = useState<SelectedTicket>();
   const [selectedTickets, setSelectedTickets] = useState<SelectedTickets>([]);
 
   useEffect(() => {
@@ -84,7 +95,12 @@ const PurchaseTickets = () => {
     fetchMovies()
       .then((movies) => {
         // TO DO: transform data based on reponse from Backend before setMovies
-        setMovies(movies);
+        setData((currentData) => {
+          return {
+            ...currentData,
+            movies: movies
+          }
+        });
       })
       .catch((error) => console.log(error));
 
@@ -92,75 +108,113 @@ const PurchaseTickets = () => {
     fetchTickets()
       .then((tickets) => {
         // TO DO: transform data based on reponse from Backend before setTicketTypes
-        setTicketTypes(tickets);
+        setData((currentData) => {
+          return {
+            ...currentData,
+            tickets: tickets
+          }
+        });
       })
       .catch((error) => console.log(error));
   }, []);
 
   // TO DO: Check customer response in the case of new customer
   const fetchCustomerHandler = (email: string) => {
-    console.log("fetch customer...", email);
-
     // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
     fetchCustomer(email)
       .then((customer) => {
         // TO DO: transform data based on reponse from Backend before setCustomer
-        setCustomer(customer);
+        setData((currentVals) => {
+          return {
+            ...currentVals,
+            customer: customer
+          }
+        });
       })
       .catch((error) => console.log(error));
   };
 
-  const inputChangeHandler = (label: string, val: string | number) => {
+  const inputChangeHandler = (label: string, val: string) => {
     console.log(label, val);
 
     // FOR TESTING ONLY REMOVE ONCE BACKEND IS READY
     if (label === "Customer Name") {
-      setCustomer((currentVals) => {
+      setData((currentVals) => {
+        const currentCustomer = currentVals.customer;
         return {
           ...currentVals,
-          name: val,
+          customer: {
+            name: val,
+            email: currentCustomer.email,
+            type: currentCustomer.type
+          }
         };
       });
     } else if (label === "Customer Type") {
-      setCustomer((currentVals) => {
+      setData((currentVals) => {
+        const currentCustomer = currentVals.customer;
         return {
           ...currentVals,
-          type: val,
+          customer: {
+            email: currentCustomer.email,
+            name: currentCustomer.name,
+            type: val
+          }
         };
       });
     }
     //----
-
-    if (label === "Customer Email input") {
-      setCustomer((currentVals) => {
-        return {
-          ...currentVals,
-          email: val,
-        };
-      });
-    } else if (label === "Tickets option") {
-      setSelectedTicket((currentVals) => {
-        return {
-          ...currentVals,
-          type: val
-        };
-      });
-    } else if (label === "Tickets input") {
-      setSelectedTicket((currentVals) => {
-        return {
-          ...currentVals,
-          qty: +val,
-        };
-      });
-    } else if (label === "Movie") {
-      setSelectedMovie(val);
+    switch (label) {
+      case "Customer Email input":
+        return setData((currentVals) => {
+          const currentCustomer = currentVals.customer; 
+          return {
+            ...currentVals,
+            customer: {
+              name: currentCustomer.name,
+              type: currentCustomer.type,
+              email: val
+            }
+          };
+        });
+      case "Tickets option":
+        return setData((currentVals) => {
+          const currentTicket = currentVals.selectedTicket;
+          return {
+            ...currentVals,
+            selectedTicket: {
+              type: val,
+              qty: currentTicket.qty
+            }
+          };
+        });
+      case "Tickets input":
+        return setData((currentVals) => {
+          const currentTicket = currentVals.selectedTicket;
+          return {
+            ...currentVals,
+            selectedTicket: {
+              type: currentTicket.type,
+              qty: +val,
+            }
+          };
+        });
+      case "Movie":
+        return setData((currentVals) => {
+          return {
+            ...currentVals,
+            selectedMovie: val
+          }
+        });
+      default:
+        return;
     }
   };
 
   const addNewTicketsHandler = (data) => {
     setSelectedTickets((currentVals) => {
-      return [...currentVals, selectedTicket]
+      return [...currentVals, data.selectedTicket];
     });
     console.log(data);
   };
@@ -169,11 +223,14 @@ const PurchaseTickets = () => {
     event.preventDefault();
     // TO DO: Add funtionality to purchase ticket
     const newBooking = {
-      name: customer?.name,
-      email: customer?.email,
-      type: customer?.type,
-      movie: selectedMovie,
-      tickets: selectedTickets.length === 0? [selectedTicket] : selectedTickets
+      customer: {
+        name: data.customer.name,
+        email: data.customer.email,
+        type: data.customer.type,
+      },
+      movie: data.selectedMovie,
+      tickets:
+        selectedTickets.length === 0 ? [data.selectedTicket] : selectedTickets,
     };
 
     console.log(newBooking);
