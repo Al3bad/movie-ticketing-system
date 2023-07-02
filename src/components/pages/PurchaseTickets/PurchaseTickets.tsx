@@ -1,3 +1,4 @@
+import {fetchCustomer, fetchMovies, fetchTickets, submitBooking} from "../../../utils/http-requests";
 import Button from "../../UI/Button/Button";
 import Dropdown from "../../UI/Dropdown/Dropdown";
 import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
