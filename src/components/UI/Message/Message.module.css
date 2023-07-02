@@ -1,0 +1,11 @@
+.message {
+    margin-bottom: 10px;
+}
+
+.message--error {
+    color: var(--error-color);
+}
+
+.message--success {
+    color: var(--success-color);
+}
