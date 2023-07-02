@@ -9,6 +9,8 @@
   --primary: rgba(52, 96, 197, 1);
   --secondary: rgba(249, 250, 252, 1);
   --default-bg-color: rgba(249, 250, 252, 1);
+  --error-color: red;
+  --success-color: green;
 }
 
 /* Global Styling */

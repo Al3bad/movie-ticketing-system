@@ -5,6 +5,7 @@ import Button from "../../UI/Button/Button";
 import Dropdown from "../../UI/Dropdown/Dropdown";
 import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
 import Input from "../../UI/Input/Input";
+import Message from "../../UI/Message/Message";
 import Icon from "../../UI/Icon/Icon";
 import {
   fetchCustomer,
@@ -22,6 +23,10 @@ type Data = {
   selectedMovie: string;
   selectedTickets: Ticket[];
 };
+type Msg = {
+  type: "error" | "success";
+  text: string;
+}
 
 const PurchaseTickets = () => {
   // TO DO: NEED TO REMOVE ONCE BACKEND IS READY
@@ -29,26 +34,14 @@ const PurchaseTickets = () => {
     {
       id: 1,
       value: "Normal",
-    },
-    {
-      id: 2,
-      value: "Flat",
-    },
-    {
-      id: 3,
-      value: "Step",
-    },
+    }
   ];
 
   const DUMMY_MOVIES = [
     {
       id: 1,
       value: "Avatar",
-    },
-    {
-      id: 2,
-      value: "Avengers",
-    },
+    }
   ];
   const DUMMY_TICKETS = [
     {
@@ -73,6 +66,7 @@ const PurchaseTickets = () => {
   const [data, setData] = useState<Data>(initialData);
   const [isCustomerFetched, setIsCustomerFetched] = useState(false);
   const [ticketInputIds, setTicketInputIds] = useState([0]);
+  const [msg, setMsg] = useState<Msg>();
 
   useEffect(() => {
     // Fetch Movies on Page Load
@@ -212,7 +206,7 @@ const PurchaseTickets = () => {
       },
       movie: data.selectedMovie,
       tickets: data.selectedTickets.filter(
-        (ticket) => ticket.type !== "" && ticket.qty !== 0
+        (ticket) => ticket.type !== "" && ticket.qty !== 0 // Remove invalid ticket inputs
       ),
     };
 
@@ -228,9 +222,16 @@ const PurchaseTickets = () => {
         .catch((error) => console.log("error", error));
     } else {
       // display errors on the form
-      result.error.issues.forEach((error) => {
+      let msg = "Invalid inputs for: ";
+      result.error.issues.forEach((error, idx) => {
         console.log(error.path, error.message);
+        if (idx !== result.error.issues.length - 1) {
+          msg += error.path[0] + ", ";
+        } else {
+          msg += error.path[0];
+        }
       });
+      setMsg({type: "error", text: msg})
     }
   };
 
@@ -239,7 +240,8 @@ const PurchaseTickets = () => {
       <div
         className={`${styles["purchase-tickets"]} ${styles["purchase-tickets__block"]}`}
       >
-        <h2 className={styles["purchase-tickets__title"]}>Purchase Tickets</h2>
+      <h2 className={styles["purchase-tickets__title"]}>Purchase Tickets</h2>
+      {msg && <Message msg={msg.text} type={msg.type}/>}
 
         <form onSubmit={purchaseTicketHandler}>
           <MultipleInputs
