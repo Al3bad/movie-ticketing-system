@@ -1,15 +1,11 @@
--- Customer (_email_, name, type, discountRate, threshold)
--- Ticket (_type_, compnent*, price, qty)
--- Movie (_title_, seatAvailable, isReleased)
--- Booking (_customerEmail*_, _movieTitle*_)
--- BookingHasTicket(_customerEmail*_, _movieTitle*_, _ticketName*_)
+PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS customer (
     email TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     type TEXT NOT NULL,
-    discountRate REAL NOT NULL,
-    threshold REAL NOT NULL
+    discountRate REAL DEFAULT 0,
+    threshold REAL
 );
 
 CREATE TABLE IF NOT EXISTS movie (
@@ -28,21 +24,17 @@ CREATE TABLE IF NOT EXISTS ticket (
 );
 
 CREATE TABLE IF NOT EXISTS booking (
+    id INTEGER PRIMARY KEY,
     customerEmail TEXT NOT NULL,
     movieTitle TEXT NOT NULL,
-    PRIMARY KEY (customerEmail, movieTitle),
     FOREIGN KEY (customerEmail) REFERENCES customer (email),
     FOREIGN KEY (movieTitle) REFERENCES movie (title)
 );
 
-CREATE TABLE IF NOT EXISTS bookingWithTickets (
-    customerEmail TEXT NOT NULL,
-    movieTitle TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS purchasedTicket (
+    bookingId INTEGER NOT NULL,
     ticketType TEXT NOT NULL,
-    PRIMARY KEY (customerEmail, movieTitle, ticketType),
-    FOREIGN KEY (customerEmail) REFERENCES customer (email),
-    FOREIGN KEY (movieTitle) REFERENCES movie (title),
-    FOREIGN KEY (ticketType) REFERENCES ticket (type)
+    qty INTEGER NOT NULL,
+    PRIMARY KEY (bookingId, ticketType),
+    FOREIGN KEY (bookingId) REFERENCES booking (id)
 );
-
-

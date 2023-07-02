@@ -72,9 +72,10 @@ type StepCustomer = Modify<
 // ==============================================
 
 type NewBooking = {
-  email: string;
-  name: string;
-  type: CustomerType;
+  // email: string;
+  // name: string;
+  // type: CustomerType;
+  customer: NormalCustomer | FlatCustomer | StepCustomer;
   movie: string;
   tickets: Ticket[];
 };

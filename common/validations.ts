@@ -56,11 +56,16 @@ export const StepCustomerSchema = FlatCustomerSchema.extend({
 // ==============================================
 
 export const NewBookingSchema = z.object({
-  email: z.string().email(),
-  name: z.string(),
-  type: z.enum(["Normal", "Flat", "Step"]),
+  // email: z.string().email(),
+  // name: z.string(),
+  // type: z.enum(["Normal", "Flat", "Step"]),
+  customer: z.union([
+    NormalCustomerSchema,
+    FlatCustomerSchema,
+    StepCustomerSchema,
+  ]),
   movie: z.string(),
-  tickets: z.array(TicketSchema),
+  tickets: z.array(TicketSchema).min(1),
 });
 
 export const BookingSchema = NewBookingSchema.extend({
