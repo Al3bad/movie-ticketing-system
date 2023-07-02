@@ -1,33 +1,55 @@
+import React from "react";
 import Dropdown from "../Dropdown/Dropdown";
 import Input from "../Input/Input";
 import Button from "../Button/Button";
 import Icon from "../Icon/Icon";
 import styles from "./MultipleInputs.module.css";
 
-const MultipleInputs = (props) => {
+type MultipleInputsProps = {
+  type: string;
+  label: string;
+  hide_label: boolean;
+  options?: Movie[] | Ticket[];
+  onInputChange?: (label: string, val: string | number) => void;
+  onButtonClick?: () => void;
+};
+const MultipleInputs: React.FC<MultipleInputsProps> = ({
+  type,
+  label,
+  hide_label = false,
+  options,
+  onInputChange,
+  onButtonClick,
+}) => {
   const inputHandler = (label: string, val: string | number) => {
-    props.onInputChange(`${label} input`, val);
+    if (onInputChange) {
+      onInputChange(`${label} input`, val);
+    }
   };
 
   const dropdownHandler = (label: string, val: string | number) => {
-    props.onInputChange(`${label} option`, val);
+    if (onInputChange) {
+      onInputChange(`${label} option`, val);
+    }
   };
 
   const buttonClickHandler = () => {
-    props.onButtonClick();
+    if (onButtonClick) {
+      onButtonClick();
+    }
   };
 
   let multiInput = <div></div>;
 
-  if (props.type === "dropdown-w-input") {
+  if (type === "dropdown-w-input") {
     multiInput = (
       <div className={styles["multi-inputs"]}>
         <div
           className={`${styles["multi-inputs"]} ${styles["multi-inputs__lg"]}`}
         >
           <Dropdown
-            options={props.options}
-            label={props.label}
+            options={options}
+            label={label}
             classLabel="multi-inputs-l"
             onInputChange={dropdownHandler}
           />
@@ -37,14 +59,14 @@ const MultipleInputs = (props) => {
         >
           <Input
             type="number"
-            label={props.label}
+            label={label}
             classLabel="multi-inputs-r"
             onInputChange={inputHandler}
           />
         </div>
       </div>
     );
-  } else if (props.type === "input-w-btn") {
+  } else if (type === "input-w-btn") {
     multiInput = (
       <div className={styles["multi-inputs"]}>
         <div
@@ -52,7 +74,7 @@ const MultipleInputs = (props) => {
         >
           <Input
             type="text"
-            label={props.label}
+            label={label}
             classLabel="multi-inputs-l"
             onInputChange={inputHandler}
           />
@@ -60,17 +82,22 @@ const MultipleInputs = (props) => {
         <div
           className={`${styles["multi-inputs"]} ${styles["multi-inputs__sm"]}`}
         >
-          <Button type="button" label={props.label} classLabels={["multi-inputs-r", "secondary"]} onButtonClick={buttonClickHandler}>
+          <Button
+            type="button"
+            label={label}
+            classLabels={["multi-inputs-r", "secondary"]}
+            onButtonClick={buttonClickHandler}
+          >
             <Icon name="check" />
           </Button>
         </div>
       </div>
     );
-  } 
+  }
 
   return (
     <div>
-      <p>{props.label}</p>
+      {!hide_label && <p>{label}</p>}
       {multiInput}
     </div>
   );
