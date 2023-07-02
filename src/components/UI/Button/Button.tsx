@@ -5,6 +5,7 @@ type ButtonProps = {
   classLabels: string[];
   label: string;
   onButtonClick?: (text: string) => void;
+  children?: any;
 };
 
 const Button: React.FC<ButtonProps> = ({children, label, classLabels, onButtonClick, ...btnAttr}) => {

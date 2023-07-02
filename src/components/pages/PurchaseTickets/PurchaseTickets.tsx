@@ -1,4 +1,11 @@
 import { useState, useEffect } from "react";
+
+import styles from "./PurchaseTickets.module.css";
+import Button from "../../UI/Button/Button";
+import Dropdown from "../../UI/Dropdown/Dropdown";
+import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
+import Input from "../../UI/Input/Input";
+import Icon from "../../UI/Icon/Icon";
 import {
   fetchCustomer,
   fetchMovies,
@@ -6,12 +13,15 @@ import {
   submitBooking,
 } from "../../../utils/http-requests";
 import { NewBookingSchema } from "../../../../common/validations";
-import Button from "../../UI/Button/Button";
-import Dropdown from "../../UI/Dropdown/Dropdown";
-import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
-import Input from "../../UI/Input/Input";
-import Icon from "../../UI/Icon/Icon";
-import styles from "./PurchaseTickets.module.css";
+
+type Customer = { name: string; email: string; type: string };
+type Data = {
+  movies: NewMovie[];
+  ticketTypes: NewTicket[];
+  customer: Customer;
+  selectedMovie: string;
+  selectedTickets: Ticket[];
+};
 
 const PurchaseTickets = () => {
   // TO DO: NEED TO REMOVE ONCE BACKEND IS READY
@@ -39,52 +49,42 @@ const PurchaseTickets = () => {
       id: 2,
       value: "Avengers",
     },
-    {
-      id: 3,
-      value: "Star War",
-    },
   ];
   const DUMMY_TICKETS = [
     {
       id: 1,
-      value: "Student",
+      value: "adult",
     },
     {
       id: 2,
-      value: "Senior",
-    },
-    {
-      id: 3,
-      value: "Concession",
+      value: "child",
     },
   ];
   //----
-  type Customer = {
-    email: string;
-    name: string;
-    type: string;
-  };
-  type Movie = {
-    title: string;
-  };
-  type Ticket = { name: string; price: number };
-  type SelectedTicket = {name: string, qty: number}
-  type SelectedTickets = SelectedTicket[];
 
-  const [customer, setCustomer] = useState<Customer>(); // {email: "", name: "", type: ""}
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [ticketTypes, setTicketTypes] = useState<Ticket[]>([]);
+  const initialData = {
+    movies: [],
+    ticketTypes: [],
+    customer: { email: "", name: "", type: "" },
+    selectedMovie: "",
+    selectedTickets: [{ type: "", qty: 0 }],
+  };
+
+  const [data, setData] = useState<Data>(initialData);
   const [isCustomerFetched, setIsCustomerFetched] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<string>();
-  const [selectedTicket, setSelectedTicket] = useState<SelectedTicket>();
-  const [selectedTickets, setSelectedTickets] = useState<SelectedTickets>([]);
+  const [ticketInputIds, setTicketInputIds] = useState([0]);
 
   useEffect(() => {
     // Fetch Movies on Page Load
     fetchMovies()
       .then((movies) => {
         // TO DO: transform data based on reponse from Backend before setMovies
-        setMovies(movies);
+        setData((currentData) => {
+          return {
+            ...currentData,
+            movies: movies,
+          };
+        });
       })
       .catch((error) => console.log(error));
 
@@ -92,88 +92,128 @@ const PurchaseTickets = () => {
     fetchTickets()
       .then((tickets) => {
         // TO DO: transform data based on reponse from Backend before setTicketTypes
-        setTicketTypes(tickets);
+        setData((currentData) => {
+          return {
+            ...currentData,
+            tickets: tickets,
+          };
+        });
       })
       .catch((error) => console.log(error));
   }, []);
 
   // TO DO: Check customer response in the case of new customer
-  const fetchCustomerHandler = (email: string) => {
-    console.log("fetch customer...", email);
-
+  const fetchCustomerHandler = () => {
     // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
-    fetchCustomer(email)
-      .then((customer) => {
-        // TO DO: transform data based on reponse from Backend before setCustomer
-        setCustomer(customer);
-      })
-      .catch((error) => console.log(error));
+    if (data.customer.email) {
+      fetchCustomer(data.customer.email)
+        .then((customer) => {
+          // TO DO: transform data based on reponse from Backend before setCustomer
+          setData((currentVals) => {
+            return {
+              ...currentVals,
+              customer: customer,
+            };
+          });
+        })
+        .catch((error) => console.log(error));
+    }
   };
 
-  const inputChangeHandler = (label: string, val: string | number) => {
-    console.log(label, val);
-
+  const inputChangeHandler = (label: string, val: string, id = -1) => {
     // FOR TESTING ONLY REMOVE ONCE BACKEND IS READY
     if (label === "Customer Name") {
-      setCustomer((currentVals) => {
+      setData((currentVals) => {
+        const currentCustomer = { ...currentVals.customer };
+        currentCustomer.name = val;
         return {
           ...currentVals,
-          name: val,
+          customer: currentCustomer,
         };
       });
     } else if (label === "Customer Type") {
-      setCustomer((currentVals) => {
+      setData((currentVals) => {
+        const currentCustomer = { ...currentVals.customer };
+        currentCustomer.type = val;
         return {
           ...currentVals,
-          type: val,
+          customer: currentCustomer,
         };
       });
     }
     //----
-
-    if (label === "Customer Email input") {
-      setCustomer((currentVals) => {
-        return {
-          ...currentVals,
-          email: val,
-        };
-      });
-    } else if (label === "Tickets option") {
-      setSelectedTicket((currentVals) => {
-        return {
-          ...currentVals,
-          type: val
-        };
-      });
-    } else if (label === "Tickets input") {
-      setSelectedTicket((currentVals) => {
-        return {
-          ...currentVals,
-          qty: +val,
-        };
-      });
-    } else if (label === "Movie") {
-      setSelectedMovie(val);
+    switch (label) {
+      case "Customer Email input":
+        return setData((currentVals) => {
+          const currentCustomer = { ...currentVals.customer };
+          currentCustomer.email = val;
+          return {
+            ...currentVals,
+            customer: currentCustomer,
+          };
+        });
+      case "Tickets option":
+        return setData((currentVals) => {
+          const currentTickets = [...currentVals.selectedTickets];
+          if (id >= 0) {
+            currentTickets[id].type = val;
+            return {
+              ...currentVals,
+              selectedTickets: currentTickets,
+            };
+          }
+          return currentVals;
+        });
+      case "Tickets input":
+        return setData((currentVals) => {
+          const currentTickets = [...currentVals.selectedTickets];
+          if (id >= 0) {
+            currentTickets[id].qty = +val;
+            console.log(currentTickets);
+            return {
+              ...currentVals,
+              selectedTickets: currentTickets,
+            };
+          }
+          return currentVals;
+        });
+      case "Movie":
+        return setData((currentVals) => {
+          return {
+            ...currentVals,
+            selectedMovie: val,
+          };
+        });
+      default:
+        return;
     }
   };
 
-  const addNewTicketsHandler = (data) => {
-    setSelectedTickets((currentVals) => {
-      return [...currentVals, selectedTicket]
+  const addNewTicketsHandler = () => {
+    setTicketInputIds((currentIds) => [...currentIds, currentIds.length]);
+    setData((currentVals) => {
+      const currentSelectedTickets = currentVals.selectedTickets;
+      return {
+        ...currentVals,
+        selectedTickets: [...currentSelectedTickets, { type: "", qty: 0 }],
+      };
     });
-    console.log(data);
   };
 
-  const purchaseTicketHandler = (event) => {
+  const purchaseTicketHandler = (event: React.FormEvent) => {
     event.preventDefault();
     // TO DO: Add funtionality to purchase ticket
     const newBooking = {
-      name: customer?.name,
-      email: customer?.email,
-      type: customer?.type,
-      movie: selectedMovie,
-      tickets: selectedTickets.length === 0? [selectedTicket] : selectedTickets
+      customer: {
+        name: data.customer.name,
+        email: data.customer.email,
+        type: data.customer.type,
+      },
+      movie: data.selectedMovie,
+      tickets: data.selectedTickets.filter(
+        (ticket) => ticket.type !== "" && ticket.qty !== 0
+      ),
     };
 
     console.log(newBooking);
@@ -183,7 +223,9 @@ const PurchaseTickets = () => {
 
     if (result.success) {
       // send data to the backend
-      console.log(result);
+      submitBooking(newBooking)
+        .then((response) => console.log("success", response))
+        .catch((error) => console.log("error", error));
     } else {
       // display errors on the form
       result.error.issues.forEach((error) => {
@@ -246,12 +288,20 @@ const PurchaseTickets = () => {
             onInputChange={inputChangeHandler}
           />
 
-          <MultipleInputs
-            label="Tickets"
-            options={DUMMY_TICKETS}
-            type="dropdown-w-input"
-            onInputChange={inputChangeHandler}
-          />
+          <p>Tickets</p>
+          {/* Dynamically generate a list of ticket inputs */}
+          {ticketInputIds.map((id) => (
+            <MultipleInputs
+              key={id}
+              label="Tickets"
+              hide_label={true}
+              options={DUMMY_TICKETS}
+              type="dropdown-w-input"
+              onInputChange={(label: string, val: string) =>
+                inputChangeHandler(label, val, id)
+              }
+            />
+          ))}
 
           <Button
             type="button"
