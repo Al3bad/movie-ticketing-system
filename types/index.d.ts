@@ -12,7 +12,7 @@ type Modify<T, R> = Omit<T, keyof R> & R;
 
 type NewMovie = {
   title: string;
-  seatsAvailable: number;
+  seatAvailable: number;
   isReleased: boolean;
 };
 

@@ -4,6 +4,45 @@ import db from "./db";
 import { SqliteError } from "better-sqlite3";
 
 // ==============================================
+// ==> Error Handling
+// ==============================================
+const dbErrorHandler = (err: unknown) => {
+  if (err instanceof SqliteError) {
+    if (err.code === "SQLITE_CONSTRAINT_PRIMARYKEY") {
+      return {
+        type: "DB",
+        msg: err.message,
+      };
+    } else if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
+      return {
+        type: "DB",
+        msg: err.message,
+      };
+    } else if (err.code === "SQLITE_CONSTRAINT_CHECK") {
+      return {
+        type: "DB",
+        msg: "The number of requested seats exceeds the seats available!",
+      };
+    } else {
+      return {
+        type: "DB_" + err.code,
+        msg: err.message,
+      };
+    }
+  } else if (err instanceof Error) {
+    return {
+      type: "UNKNOWN",
+      msg: err.message,
+    };
+  } else {
+    return {
+      type: "UNKNOWN",
+      msg: `Error occured in ${__filename}`,
+    };
+  }
+};
+
+// ==============================================
 // ==> Init DB
 // ==============================================
 export const initDB = async () => {
@@ -12,10 +51,63 @@ export const initDB = async () => {
       path.join(__dirname, "sqlite", "createTables.sql"),
       "utf8"
     );
-    db.exec(createTablesQueries);
+    db.connection.exec(createTablesQueries);
   } catch (err: unknown) {
     console.log("[ERROR] Couldn't read the sql file to init the DB");
     process.exit(1);
+  }
+};
+
+// ==============================================
+// ==> Movie Queries
+// ==============================================
+export const insertMovie = (newMovie: NewMovie) => {
+  const { title, seatAvailable, isReleased } = newMovie;
+
+  try {
+    const stmt = db.connection.prepare(
+      "INSERT INTO movie(title, seatAvailable, isReleased) VALUES (?,?,?)"
+    );
+    stmt.run(title, seatAvailable, isReleased ? 1 : 0);
+    return newMovie;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
+  }
+};
+
+// ==============================================
+// ==> Ticket Queries
+// ==============================================
+// TODO: type it properly
+export const insertTicket = (newTicket: any) => {
+  const { type, component, price, qty } = newTicket;
+
+  try {
+    const stmt = db.connection.prepare(
+      "INSERT INTO ticket(type, component, price, qty) VALUES (?,?,?,?)"
+    );
+    stmt.run(type, component, price, qty);
+    return newTicket;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
+  }
+};
+
+// ==============================================
+// ==> Customer Queries
+// ==============================================
+// TODO: type it properly
+export const insertCustomer = (newCustomer: any) => {
+  const { email, name, type, discoundRate, threshold } = newCustomer;
+
+  try {
+    const stmt = db.connection.prepare(
+      "INSERT INTO customer(email, name, type, discountRate, threshold) VALUES (?,?,?,?,?)"
+    );
+    stmt.run(email, name, type, discoundRate, threshold);
+    return newCustomer;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
   }
 };
 
@@ -27,49 +119,34 @@ export const insertBooking = (newBooking: NewBooking) => {
 
   // Create new customer, if not exists
   try {
-    db.prepare("BEGIN").run();
-    db.prepare("INSERT INTO customer(email, name, type) VALUES (?, ?, ?)").run(
-      customer.email,
-      customer.name,
-      customer.type
-    );
+    db.connection.prepare("BEGIN").run();
+    db.connection
+      .prepare("INSERT INTO customer(email, name, type) VALUES (?, ?, ?)")
+      .run(customer.email, customer.name, customer.type);
   } catch (err: unknown) {
-    if (err instanceof SqliteError) {
-      if (err.code === "SQLITE_CONSTRAINT_PRIMARYKEY") {
-        console.log(
-          "Customer exist in the system. Skipping creating new customer"
-        );
-      }
-    } else if (err instanceof Error) {
-      db.prepare("ROLLBACK").run();
-      return {
-        error: {
-          type: "DB",
-          msg: err.message,
-        },
-      };
+    const error = dbErrorHandler(err);
+    if (
+      err instanceof SqliteError &&
+      err.code === "SQLITE_CONSTRAINT_PRIMARYKEY"
+    ) {
+      console.log("Customer already exists!");
     } else {
-      db.prepare("ROLLBACK").run();
-      return {
-        error: {
-          type: "UNKNOWN",
-          msg: `Error occured in ${__filename}`,
-        },
-      };
+      db.connection.prepare("ROLLBACK").run();
+      return { error: error };
     }
   }
 
   // Insert into booking table
   const booking: { id?: number | bigint } = {};
   try {
-    const info = db
+    const info = db.connection
       .prepare("INSERT INTO booking(customerEmail, movieTitle) VALUES (?, ?)")
       .run(customer.email, movie);
     booking.id = info.lastInsertRowid;
   } catch (err: unknown) {
     if (err instanceof SqliteError) {
       if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-        db.prepare("ROLLBACK").run();
+        db.connection.prepare("ROLLBACK").run();
         return {
           error: {
             type: "DB",
@@ -78,7 +155,7 @@ export const insertBooking = (newBooking: NewBooking) => {
         };
       }
     } else if (err instanceof Error) {
-      db.prepare("ROLLBACK").run();
+      db.connection.prepare("ROLLBACK").run();
       return {
         error: {
           type: "DB",
@@ -86,7 +163,7 @@ export const insertBooking = (newBooking: NewBooking) => {
         },
       };
     } else {
-      db.prepare("ROLLBACK").run();
+      db.connection.prepare("ROLLBACK").run();
       return {
         error: {
           type: "UNKNOWN",
@@ -103,13 +180,15 @@ export const insertBooking = (newBooking: NewBooking) => {
       0
     );
 
-    db.prepare(
-      "UPDATE movie SET seatAvailable = (SELECT seatAvailable FROM movie WHERE title = ?) - ? WHERE title = ?"
-    ).run(movie, totalTickets, movie);
+    db.connection
+      .prepare(
+        "UPDATE movie SET seatAvailable = (SELECT seatAvailable FROM movie WHERE title = ?) - ? WHERE title = ?"
+      )
+      .run(movie, totalTickets, movie);
   } catch (err: unknown) {
     if (err instanceof SqliteError) {
       if (err.code === "SQLITE_CONSTRAINT_CHECK") {
-        db.prepare("ROLLBACK").run();
+        db.connection.prepare("ROLLBACK").run();
         return {
           error: {
             type: "DB",
@@ -118,7 +197,7 @@ export const insertBooking = (newBooking: NewBooking) => {
         };
       }
     } else if (err instanceof Error) {
-      db.prepare("ROLLBACK").run();
+      db.connection.prepare("ROLLBACK").run();
       return {
         error: {
           type: "DB",
@@ -126,7 +205,7 @@ export const insertBooking = (newBooking: NewBooking) => {
         },
       };
     } else {
-      db.prepare("ROLLBACK").run();
+      db.connection.prepare("ROLLBACK").run();
       return {
         error: {
           type: "UNKNOWN",
@@ -139,13 +218,15 @@ export const insertBooking = (newBooking: NewBooking) => {
   // Insert puchased tickets into "purchased ticket" table
   for (const { type, qty } of tickets) {
     try {
-      db.prepare(
-        "INSERT INTO purchasedTicket (bookingId, ticketType, qty) VALUES (?,?,?)"
-      ).run(booking.id, type, qty);
+      db.connection
+        .prepare(
+          "INSERT INTO purchasedTicket (bookingId, ticketType, qty) VALUES (?,?,?)"
+        )
+        .run(booking.id, type, qty);
     } catch (err: unknown) {
       if (err instanceof SqliteError) {
         if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-          db.prepare("ROLLBACK").run();
+          db.connection.prepare("ROLLBACK").run();
           return {
             error: {
               type: "DB",
@@ -154,7 +235,7 @@ export const insertBooking = (newBooking: NewBooking) => {
           };
         }
       } else if (err instanceof Error) {
-        db.prepare("ROLLBACK").run();
+        db.connection.prepare("ROLLBACK").run();
         return {
           error: {
             type: "DB",
@@ -162,7 +243,7 @@ export const insertBooking = (newBooking: NewBooking) => {
           },
         };
       } else {
-        db.prepare("ROLLBACK").run();
+        db.connection.prepare("ROLLBACK").run();
         return {
           error: {
             type: "UNKNOWN",
@@ -172,7 +253,7 @@ export const insertBooking = (newBooking: NewBooking) => {
       }
     }
   }
-  db.prepare("COMMIT").run();
+  db.connection.prepare("COMMIT").run();
   return {
     id: booking.id,
     ...newBooking,
