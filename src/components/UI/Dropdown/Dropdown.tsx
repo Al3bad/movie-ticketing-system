@@ -2,10 +2,9 @@ import React from "react";
 import styles from "./Dropdown.module.css";
 
 type Option = {
-  id: number;
+  id: string | number;
   value: string;
-};
-
+}
 type DropdownProps = {
   label: string;
   classLabel?: string;
@@ -33,9 +32,9 @@ const Dropdown: React.FC<DropdownProps> = ({
         <option value="DEFAULT" disabled>
           Select an option...
         </option>
-        {options.map((option: Option) => {
+        {options.map((option) => {
           return (
-            <option key={option.id} value={option.value}>
+            <option key={option.value} value={option.value}>
               {option.value}
             </option>
           );

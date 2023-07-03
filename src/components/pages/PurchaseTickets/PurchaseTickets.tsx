@@ -26,7 +26,7 @@ type Data = {
 type Msg = {
   type: "error" | "success";
   text: string;
-}
+};
 
 const PurchaseTickets = () => {
   // TO DO: NEED TO REMOVE ONCE BACKEND IS READY
@@ -34,23 +34,6 @@ const PurchaseTickets = () => {
     {
       id: 1,
       value: "Normal",
-    }
-  ];
-
-  const DUMMY_MOVIES = [
-    {
-      id: 1,
-      value: "Avatar",
-    }
-  ];
-  const DUMMY_TICKETS = [
-    {
-      id: 1,
-      value: "adult",
-    },
-    {
-      id: 2,
-      value: "child",
     },
   ];
   //----
@@ -72,11 +55,13 @@ const PurchaseTickets = () => {
     // Fetch Movies on Page Load
     fetchMovies()
       .then((movies) => {
-        // TO DO: transform data based on reponse from Backend before setMovies
+        const movieOptions = movies.map((movie: NewMovie) => {
+          return { ...movies, id: movie.title, value: movie.title };
+        });
         setData((currentData) => {
           return {
             ...currentData,
-            movies: movies,
+            movies: movieOptions,
           };
         });
       })
@@ -85,11 +70,17 @@ const PurchaseTickets = () => {
     // Fetch Ticket Types on Page Load
     fetchTickets()
       .then((tickets) => {
-        // TO DO: transform data based on reponse from Backend before setTicketTypes
+        const ticketOptions = tickets.map((ticket: NewTicket) => {
+          return {
+            ...ticket,
+            id: ticket.type,
+            value: ticket.type,
+          };
+        });
         setData((currentData) => {
           return {
             ...currentData,
-            tickets: tickets,
+            ticketTypes: ticketOptions,
           };
         });
       })
@@ -231,7 +222,7 @@ const PurchaseTickets = () => {
           msg += error.path[0];
         }
       });
-      setMsg({type: "error", text: msg})
+      setMsg({ type: "error", text: msg });
     }
   };
 
@@ -240,8 +231,8 @@ const PurchaseTickets = () => {
       <div
         className={`${styles["purchase-tickets"]} ${styles["purchase-tickets__block"]}`}
       >
-      <h2 className={styles["purchase-tickets__title"]}>Purchase Tickets</h2>
-      {msg && <Message msg={msg.text} type={msg.type}/>}
+        <h2 className={styles["purchase-tickets__title"]}>Purchase Tickets</h2>
+        {msg && <Message msg={msg.text} type={msg.type} />}
 
         <form onSubmit={purchaseTicketHandler}>
           <MultipleInputs
@@ -286,7 +277,7 @@ const PurchaseTickets = () => {
           */}
           <Dropdown
             label="Movie"
-            options={DUMMY_MOVIES}
+            options={data.movies}
             onInputChange={inputChangeHandler}
           />
 
@@ -297,7 +288,7 @@ const PurchaseTickets = () => {
               key={id}
               label="Tickets"
               hide_label={true}
-              options={DUMMY_TICKETS}
+              options={data.ticketTypes}
               type="dropdown-w-input"
               onInputChange={(label: string, val: string) =>
                 inputChangeHandler(label, val, id)

@@ -28,7 +28,7 @@ export const fetchMovies = async () => {
 }
 
 export const fetchTickets = async () => {
-    const tickets_endpoint = `${BASE_API_ENDPOINT}/tickets`;
+    const tickets_endpoint = `${BASE_API_ENDPOINT}/ticket`;
     try {
         const response = await fetch(tickets_endpoint);
         return response.json();
