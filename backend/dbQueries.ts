@@ -104,6 +104,19 @@ export const insertTicket = (newTicket: any) => {
   }
 };
 
+export const getAllTickets = () => {
+  type ETicket = Omit<Ticket, "component">;
+  try {
+    const stmt = db.connection.prepare(
+      "SELECT DISTINCT type, price, qty FROM ticket"
+    );
+    const data = stmt.all() as ETicket[];
+    return data;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
+  }
+};
+
 // ==============================================
 // ==> Customer Queries
 // ==============================================
