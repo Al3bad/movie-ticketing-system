@@ -12,31 +12,59 @@ CREATE TABLE IF NOT EXISTS customer (
 
 CREATE TABLE IF NOT EXISTS movie (
     title TEXT NOT NULL PRIMARY KEY,
-    seatAvailable INTEGER NOT NULL CHECK(seatAvailable >= 0),
-    isReleased BOOLEAN DEFAULT FALSE
+    seatAvailable INTEGER NOT NULL,
+    isReleased BOOLEAN DEFAULT FALSE,
+    -- prevent insertion when seats >= 0
+    CHECK(seatAvailable >= 0)
 );
+
 
 CREATE TABLE IF NOT EXISTS ticket (
     type TEXT NOT NULL PRIMARY KEY,
-    component TEXT,
-    price REAL NOT NULL,
-    qty INTEGER DEFAULT 1,
-    FOREIGN KEY (component) REFERENCES ticket (type)
+    price REAL
+);
+
+CREATE TABLE IF NOT EXISTS ticketComponent (
+    type TEXT NOT NULL,
+    component TEXT NOT NULL,
+    qty INTEGER NOT NULL,
+    -- prevent insertion when type == component
+    CHECK(LOWER(type) != LOWER(component)),
+    -- Composite PK
+    PRIMARY KEY (type, component),
+    -- FKs
+    FOREIGN KEY (type) REFERENCES ticket(type)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (component) REFERENCES ticket(type)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS booking (
     id INTEGER PRIMARY KEY,
     customerEmail TEXT NOT NULL,
     movieTitle TEXT NOT NULL,
-    FOREIGN KEY (customerEmail) REFERENCES customer(email),
+    -- FKs
+    FOREIGN KEY (customerEmail) REFERENCES customer(email)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
     FOREIGN KEY (movieTitle) REFERENCES movie(title)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS purchasedTicket (
     bookingId INTEGER NOT NULL,
     ticketType TEXT NOT NULL,
     qty INTEGER NOT NULL,
+    -- Composite PK
     PRIMARY KEY (bookingId, ticketType),
-    FOREIGN KEY (bookingId) REFERENCES booking (id),
+    -- FKs
+    FOREIGN KEY (bookingId) REFERENCES booking (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     FOREIGN KEY (ticketType) REFERENCES ticket (type)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
 );

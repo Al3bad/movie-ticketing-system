@@ -26,11 +26,23 @@ type Movie = NewMovie & {
 
 type NewTicket = {
   type: string;
+  price?: number;
 };
 
-type Ticket = NewTicket & {
+type Ticket = Required<NewTicket> & { qty: number };
+
+type RequestedTicket = {
+  type: string;
   qty: number;
 };
+
+type NewTicketComponent = {
+  type: string;
+  component: string;
+  qty: number;
+};
+
+type TicketComponent = NewTicketComponent;
 
 type GroupTicket = NewTicket & {
   components: Ticket[];
@@ -77,7 +89,7 @@ type NewBooking = {
   // type: CustomerType;
   customer: NormalCustomer | FlatCustomer | StepCustomer;
   movie: string;
-  tickets: Ticket[];
+  tickets: RequestedTicket[];
 };
 
 type Booking = NewBooking & {

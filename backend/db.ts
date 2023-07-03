@@ -8,6 +8,7 @@ import {
   insertCustomer,
   insertMovie,
   insertTicket,
+  insertTicketComponent,
 } from "./dbQueries";
 
 const dbDir = path.join(__dirname, process.env.DB_NAME || "database.db");
@@ -56,43 +57,23 @@ class AppDB {
     movies.push({ title: "Test", seatAvailable: 50, isReleased: true });
 
     const tickets = [
+      { type: "adult", price: 25 },
+      { type: "child", price: 15 },
+      { type: "student", price: 20 },
       {
-        type: "adult",
-        component: null,
-        price: 25,
-        qty: 1,
+        type: "Family4",
+        components: [
+          { component: "adult", qty: 2 },
+          { component: "child", qty: 2 },
+        ],
       },
       {
-        type: "child",
-        component: null,
-        price: 15,
-        qty: 1,
+        type: "Family3",
+        components: [
+          { component: "adult", qty: 2 },
+          { component: "child", qty: 1 },
+        ],
       },
-      {
-        type: "student",
-        component: null,
-        price: 20,
-        qty: 1,
-      },
-      // FIXME: Fix the database design, we can't make unique rows using 'type' attribute alone
-      // {
-      //   type: "Family4",
-      //   component: "adult",
-      //   price: 64,
-      //   qty: 4,
-      // },
-      // {
-      //   type: "Family3",
-      //   component: "adult",
-      //   price: 64,
-      //   qty: 2,
-      // },
-      // {
-      //   type: "Family3",
-      //   component: "child",
-      //   price: 64,
-      //   qty: 1,
-      // },
     ];
 
     const customers = new Array(10)
@@ -104,7 +85,20 @@ class AppDB {
     });
 
     tickets.forEach((ticket) => {
-      console.log(insertTicket(ticket));
+      if (ticket.components) {
+        console.log(insertTicket(ticket));
+        ticket.components.forEach((c) =>
+          console.log(
+            insertTicketComponent({
+              type: ticket.type,
+              component: c.component,
+              qty: c.qty,
+            })
+          )
+        );
+      } else {
+        console.log(insertTicket(ticket));
+      }
     });
 
     customers.forEach((customer) => {

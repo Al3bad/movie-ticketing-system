@@ -89,28 +89,54 @@ export const getAllMovies = () => {
 // ==============================================
 // ==> Ticket Queries
 // ==============================================
-// TODO: type it properly
-export const insertTicket = (newTicket: any) => {
-  const { type, component, price, qty } = newTicket;
+export const insertTicket = (newTicket: NewTicket) => {
+  const { type, price = null } = newTicket;
 
   try {
     const stmt = db.connection.prepare(
-      "INSERT INTO ticket(type, component, price, qty) VALUES (?,?,?,?)"
+      "INSERT INTO ticket(type, price) VALUES (?,?)"
     );
-    stmt.run(type, component, price, qty);
+    stmt.run(type, price);
     return newTicket;
   } catch (err: unknown) {
     return { error: dbErrorHandler(err) };
   }
 };
 
-export const getAllTickets = () => {
-  type ETicket = Omit<Ticket, "component">;
+export const insertTicketComponent = (
+  newTicketComponent: NewTicketComponent
+) => {
+  const { type, component, qty } = newTicketComponent;
+
   try {
     const stmt = db.connection.prepare(
-      "SELECT DISTINCT type, price, qty FROM ticket"
+      "INSERT INTO ticketComponent(type, component, qty) VALUES (?,?,?)"
     );
-    const data = stmt.all() as ETicket[];
+    stmt.run(type, component, qty);
+    return newTicketComponent;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
+  }
+};
+
+export const getAllTickets = () => {
+  const groupTicketDiscount = 0.8;
+  try {
+    const stmt = db.connection.prepare(
+      `SELECT  ticket.type,
+        IFNULL(ticket.price, SUM(groupTicket.price) * ?)
+            AS "price",
+        IFNULL(SUM(tc.qty), 1)
+            AS "qty"
+        FROM ticket
+        LEFT JOIN ticketComponent tc
+            ON ticket.type = tc.type
+        LEFT JOIN ticket groupTicket
+            ON tc.component = groupTicket.type
+        GROUP BY ticket.type
+        HAVING ticket.price IS NOT NULL OR groupTicket.price IS NOT NULL`
+    );
+    const data = stmt.all(groupTicketDiscount) as Ticket[];
     return data;
   } catch (err: unknown) {
     return { error: dbErrorHandler(err) };
