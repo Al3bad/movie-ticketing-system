@@ -29,15 +29,13 @@ const dbErrorHandler = (err: unknown) => {
         msg: err.message,
       };
     }
-  } else if (err instanceof Error) {
-    return {
-      type: "UNKNOWN",
-      msg: err.message,
-    };
   } else {
+    console.log(
+      `[ERROR] ${(err as Error).message}.\n\nOccured in filename: ${__filename}`
+    );
     return {
       type: "UNKNOWN",
-      msg: `Error occured in ${__filename}`,
+      msg: "Server error. Please contact the developer!",
     };
   }
 };
@@ -70,6 +68,19 @@ export const insertMovie = (newMovie: NewMovie) => {
     );
     stmt.run(title, seatAvailable, isReleased ? 1 : 0);
     return newMovie;
+  } catch (err: unknown) {
+    return { error: dbErrorHandler(err) };
+  }
+};
+
+export const getAllMovies = () => {
+  type EMoive = Omit<Movie, "isReleased">;
+  try {
+    const stmt = db.connection.prepare(
+      "SELECT title, seatAvailable FROM movie WHERE isReleased = true"
+    );
+    const data = stmt.all() as EMoive[];
+    return data;
   } catch (err: unknown) {
     return { error: dbErrorHandler(err) };
   }
