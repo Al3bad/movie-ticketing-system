@@ -1,8 +1,8 @@
 ## TODO
 
-- [x] BACKEND: Create new booking (POST /api/booking)
-- [x] BACKEND: Get all movies (GET /api/movie)
-- [x] BACKEND: Get all ticket types (GET /api/ticket)
+- [x] ~~BACKEND: Create new booking (POST /api/booking)~~
+- [x] BACKEND: ~~Get all movies (GET /api/movie)~~
+- [x] BACKEND: ~~Get all ticket types (GET /api/ticket)~~
 - [ ] BACKEND: Get all bookings (GET /api/booking)
 - [ ] BACKEND: Get info of a single booking (GET /api/booking/<booking-id>)
 - [ ] BACKEND: Create new customer (POST /api/customer)
