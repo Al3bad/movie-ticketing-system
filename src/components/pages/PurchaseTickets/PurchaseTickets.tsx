@@ -15,14 +15,16 @@ import {
 } from "../../../utils/http-requests";
 import { NewBookingSchema } from "../../../../common/validations";
 
-type Customer = { name: string; email: string; type: string };
 type Data = {
-  movies: NewMovie[];
-  ticketTypes: NewTicket[];
-  customer: Customer;
-  selectedMovie: string;
-  selectedTickets: Ticket[];
+  "movies": NewMovie[];
+  "ticketTypes": NewTicket[];
+  "customer-name": string;
+  "customer-type": string;
+  "customer-email-input": string;
+  "movie": string;
+  "selectedTickets": Ticket[];
 };
+
 type Msg = {
   type: "error" | "success";
   text: string;
@@ -39,11 +41,13 @@ const PurchaseTickets = () => {
   //----
 
   const initialData = {
-    movies: [],
-    ticketTypes: [],
-    customer: { email: "", name: "", type: "" },
-    selectedMovie: "",
-    selectedTickets: [{ type: "", qty: 0 }],
+    "movies": [],
+    "ticketTypes": [],
+    "customer-name": "",
+    "customer-type": "",
+    "customer-email-input": "",
+    "movie": "",
+    "selectedTickets": [{ type: "", qty: 0 }],
   };
 
   const [data, setData] = useState<Data>(initialData);
@@ -91,8 +95,8 @@ const PurchaseTickets = () => {
   const fetchCustomerHandler = () => {
     // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
-    if (data.customer.email) {
-      fetchCustomer(data.customer.email)
+    if (data["customer-email-input"]) {
+      fetchCustomer(data["customer-email-input"])
         .then((customer) => {
           // TO DO: transform data based on reponse from Backend before setCustomer
           setData((currentVals) => {
@@ -107,38 +111,9 @@ const PurchaseTickets = () => {
   };
 
   const inputChangeHandler = (label: string, val: string, id = -1) => {
-    // FOR TESTING ONLY REMOVE ONCE BACKEND IS READY
-    if (label === "Customer Name") {
-      setData((currentVals) => {
-        const currentCustomer = { ...currentVals.customer };
-        currentCustomer.name = val;
-        return {
-          ...currentVals,
-          customer: currentCustomer,
-        };
-      });
-    } else if (label === "Customer Type") {
-      setData((currentVals) => {
-        const currentCustomer = { ...currentVals.customer };
-        currentCustomer.type = val;
-        return {
-          ...currentVals,
-          customer: currentCustomer,
-        };
-      });
-    }
-    //----
+    label = label.toLocaleLowerCase().split(" ").join("-");
     switch (label) {
-      case "Customer Email input":
-        return setData((currentVals) => {
-          const currentCustomer = { ...currentVals.customer };
-          currentCustomer.email = val;
-          return {
-            ...currentVals,
-            customer: currentCustomer,
-          };
-        });
-      case "Tickets option":
+      case "tickets-option":
         return setData((currentVals) => {
           const currentTickets = [...currentVals.selectedTickets];
           if (id >= 0) {
@@ -150,7 +125,7 @@ const PurchaseTickets = () => {
           }
           return currentVals;
         });
-      case "Tickets input":
+      case "tickets-input":
         return setData((currentVals) => {
           const currentTickets = [...currentVals.selectedTickets];
           if (id >= 0) {
@@ -163,15 +138,13 @@ const PurchaseTickets = () => {
           }
           return currentVals;
         });
-      case "Movie":
+      default:
         return setData((currentVals) => {
           return {
             ...currentVals,
-            selectedMovie: val,
+            [label]: val,
           };
         });
-      default:
-        return;
     }
   };
 
@@ -191,11 +164,11 @@ const PurchaseTickets = () => {
     // TO DO: Add funtionality to purchase ticket
     const newBooking = {
       customer: {
-        name: data.customer.name,
-        email: data.customer.email,
-        type: data.customer.type,
+        name: data["customer-name"],
+        email: data["customer-email-input"],
+        type: data["customer-type"],
       },
-      movie: data.selectedMovie,
+      movie: data.movie,
       tickets: data.selectedTickets.filter(
         (ticket) => ticket.type !== "" && ticket.qty !== 0 // Remove invalid ticket inputs
       ),
