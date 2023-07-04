@@ -1,8 +1,20 @@
 import "dotenv/config";
+import { constants } from "node:http2";
 import express from "express";
 import { cors } from "./backend/middlewares";
 import api from "./backend/api";
 import { initDB } from "./backend/dbQueries";
+
+export const httpStatus = {
+  // 2xx
+  OK: constants.HTTP_STATUS_OK,
+  CREATED: constants.HTTP_STATUS_CREATED,
+  // 4xx
+  NOT_FOUND: constants.HTTP_STATUS_NOT_FOUND,
+  BAD_REQUEST: constants.HTTP_STATUS_BAD_REQUEST,
+  // 5xx
+  INTERNAL_SERVER_ERROR: constants.HTTP_STATUS_INTERNAL_SERVER_ERROR,
+};
 
 // ==============================================
 // ==> Prepare App

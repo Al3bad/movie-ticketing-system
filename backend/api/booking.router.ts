@@ -1,10 +1,27 @@
-import { Router } from "express";
+import { initRouter } from "backend/utils";
 import * as controller from "./booking.controller";
 
-const router = Router();
+// ==============================================
+// ==> Define Routes
+// ==============================================
+const routes: Backend.Route[] = [
+  // {
+  //   method: "get",
+  //   endpoint: "/",
+  //   description: "Get all bookings",
+  //   controller: controller.getAllBookings,
+  // },
+  {
+    method: "post",
+    endpoint: "/",
+    description: "Create new booking",
+    controller: controller.createBooking,
+  },
+  {
+    method: "get",
+    endpoint: "/help",
+    description: "Get list of endpoints available for /api/booking route",
+  },
+];
 
-// /api/booking/...
-router.get("/help", controller.help);
-router.post("/", controller.createBooking);
-
-export default router;
+export default initRouter("/api/booking", routes);

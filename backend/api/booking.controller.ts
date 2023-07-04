@@ -1,28 +1,7 @@
-import { constants } from "node:http2";
 import { NewBookingSchema } from "@/common/validations";
 import { insertBooking } from "backend/dbQueries";
 import { Request, Response } from "express";
-
-const {
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
-} = constants;
-
-export const help = (req: Request, res: Response) => {
-  res.json({
-    routes: [
-      {
-        endpoint: `${req.baseUrl}/`,
-        description: "Get all bookings",
-      },
-      {
-        endpoint: `${req.baseUrl}/<booking-id>`,
-        description: "Get booking info by id",
-      },
-    ],
-  });
-};
+import { httpStatus } from "server";
 
 export const createBooking = (req: Request, res: Response) => {
   // validate data received from frontend
@@ -35,16 +14,16 @@ export const createBooking = (req: Request, res: Response) => {
       return res
         .status(
           booking.error.type === "DB"
-            ? HTTP_STATUS_BAD_REQUEST
-            : HTTP_STATUS_INTERNAL_SERVER_ERROR
+            ? httpStatus.BAD_REQUEST
+            : httpStatus.INTERNAL_SERVER_ERROR
         )
         .json({ error: { msg: booking.error.msg } });
     } else {
-      return res.status(HTTP_STATUS_CREATED).json(booking);
+      return res.status(httpStatus.CREATED).json(booking);
     }
   } else {
     // if there is a problem -> res with an error
-    return res.status(HTTP_STATUS_BAD_REQUEST).json({
+    return res.status(httpStatus.BAD_REQUEST).json({
       error: {
         msg: "Invalid 'new booking' information",
         details: result.error.issues,

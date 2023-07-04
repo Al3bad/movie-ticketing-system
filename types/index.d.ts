@@ -95,3 +95,16 @@ type NewBooking = {
 type Booking = NewBooking & {
   id: number;
 };
+
+// ==============================================
+// --> Type for backend
+// ==============================================
+
+declare namespace Backend {
+  type Route = {
+    method: "get" | "post" | "put" | "delete";
+    endpoint: string;
+    description: string;
+    controller?: any;
+  };
+}

@@ -1,8 +1,15 @@
-import { Router } from "express";
-import * as controller from "./customer.controller";
+import { initRouter } from "backend/utils";
+// import * as controller from "./customer.controller";
 
-const router = Router();
+// ==============================================
+// ==> Define Routes
+// ==============================================
+const routes: Backend.Route[] = [
+  {
+    method: "get",
+    endpoint: "/help",
+    description: "Get list of endpoints available for /api/customer route",
+  },
+];
 
-router.get("/help", controller.help);
-
-export default router;
+export default initRouter("/api/customer", routes);

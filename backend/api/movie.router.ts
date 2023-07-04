@@ -1,9 +1,21 @@
-import { Router } from "express";
 import * as controller from "./movie.controller";
+import { initRouter } from "backend/utils";
 
-const router = Router();
+// ==============================================
+// ==> Define Routes
+// ==============================================
+const routes: Backend.Route[] = [
+  {
+    method: "get",
+    endpoint: "/",
+    description: "Get all released movies",
+    controller: controller.getAllMovies,
+  },
+  {
+    method: "get",
+    endpoint: "/help",
+    description: "Get list of endpoints available for /api/movie route",
+  },
+];
 
-router.get("/help", controller.help);
-router.get("/", controller.getAllMovies);
-
-export default router;
+export default initRouter("/api/movie", routes);

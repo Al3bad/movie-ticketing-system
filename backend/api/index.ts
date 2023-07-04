@@ -3,17 +3,19 @@ import routerCustomer from "./customer.router";
 import routerMovie from "./movie.router";
 import routerTicket from "./ticket.router";
 import routerBooking from "./booking.router";
-const api = Router();
+import { httpStatus } from "server";
 
-// /api
-api.get("/", (_, res) => {
-  res.end("The API is up and running :)");
-});
-
-// Routers
+const api = Router(/*  /api/...  */);
+api.get("/", (_, res) => res.end("The API is up and running :)"));
 api.use("/customer", routerCustomer);
 api.use("/movie", routerMovie);
 api.use("/ticket", routerTicket);
 api.use("/booking", routerBooking);
+
+// Not Found route handler
+api.use((_, res) => {
+  res.status(httpStatus.NOT_FOUND);
+  res.end();
+});
 
 export default api;
