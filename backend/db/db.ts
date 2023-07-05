@@ -3,34 +3,35 @@ import path from "node:path";
 import { faker } from "@faker-js/faker";
 import SQLite3, { Database, SqliteError } from "better-sqlite3";
 
-const dbDir = path.join(
-  __dirname,
-  process.env.DB_NAME || process.env.NODE_ENV === "test"
-    ? "database-test.db"
-    : "database.db"
-);
+let dbName = process.env.DB_NAME || "database.db";
+if (process.env.NODE_ENV === "test") {
+  dbName = "database-test.db";
+}
 
 export class DB {
   // Types
+  dbName: string;
   dbDir: string;
   connection: Database;
 
   // Constructor
-  constructor(dbDir: string) {
-    this.dbDir = dbDir;
-    this.connection = new SQLite3(dbDir);
+  constructor(dbName: string) {
+    this.dbName = dbName;
+    this.dbDir = path.join(__dirname, dbName);
+    this.connection = new SQLite3(this.dbDir);
     this.init();
   }
 
   init = async () => {
+    console.log("DB Name: " + this.dbName);
     this.dropAll();
     await this.createTables();
     this.seedDB(10);
     console.log("DB is ready!");
     if (process.env.NODE_ENV === "test") {
-      process.on("SIGINT", () => {
-        this.deleteDB();
-      });
+      process.on("SIGINT", () => this.deleteDB());
+      process.on("beforeExit", () => this.deleteDB());
+      process.on("exit", () => this.deleteDB());
     }
   };
 
@@ -53,17 +54,14 @@ export class DB {
 
   dropAll = () => {
     try {
-      [
-        "purchasedTicket",
-        "purchasedTicket",
-        "booking",
-        "ticketComponent",
-        "ticket",
-        "movie",
-        "customer",
-      ].forEach((table) => {
-        const stmt = this.connection.prepare("DROP TABLE IF EXISTS " + table);
-        stmt.run();
+      const tables = this.connection
+        .prepare(
+          "SELECT name FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'  ORDER BY rootpage DESC"
+        )
+        .all();
+      tables.forEach((table: any) => {
+        if (table?.name)
+          this.connection.prepare("DROP TABLE IF EXISTS " + table.name).run();
       });
       console.log("All tables dropped!");
     } catch (err: unknown) {
@@ -75,6 +73,7 @@ export class DB {
   async deleteDB() {
     try {
       await fs.rm(this.dbDir);
+      console.log(dbName + " DB has been deleted!");
     } catch (err: unknown) {
       process.exit(1);
     }
@@ -499,4 +498,4 @@ export class DB {
   };
 }
 
-export default new DB(dbDir);
+export default new DB(dbName);
