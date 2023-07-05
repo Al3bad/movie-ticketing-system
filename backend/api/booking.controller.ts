@@ -1,5 +1,6 @@
 import { NewBookingSchema } from "@/common/validations";
-import { insertBooking } from "backend/dbQueries";
+// import { insertBooking } from "backend/db/dbQueries";
+import db from "backend/db/db";
 import { Request, Response } from "express";
 import { httpStatus } from "server";
 
@@ -9,7 +10,7 @@ export const createBooking = (req: Request, res: Response) => {
 
   if (result.success) {
     // call function to insert data in db
-    const booking = insertBooking(result.data);
+    const booking = db.insertBooking(result.data);
     if (booking.error) {
       return res
         .status(
@@ -32,17 +33,17 @@ export const createBooking = (req: Request, res: Response) => {
   }
 };
 
-export const getAllBookings = (req: Request, res: Response) => {
+export const getAllBookings = (_: Request, res: Response) => {
   // TODO:
   res.end("TODO");
 };
 
-export const getBookingById = (req: Request, res: Response) => {
+export const getBookingById = (_: Request, res: Response) => {
   // TODO:
   res.end("TODO");
 };
 
-export const exportRecords = (req: Request, res: Response) => {
+export const exportRecords = (_: Request, res: Response) => {
   // TODO:
   res.end("TODO");
 };

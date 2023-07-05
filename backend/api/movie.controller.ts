@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import * as query from "backend/dbQueries";
+// import * as query from "backend/db/dbQueries";
+import db from "backend/db/db";
 import { httpStatus } from "server";
 
 export const getAllMovies = (_: Request, res: Response) => {
-  const movies = query.getAllMovies();
+  const movies = db.getAllMovies();
   if (movies instanceof Array) {
     return res.status(httpStatus.OK).json(movies);
   } else {

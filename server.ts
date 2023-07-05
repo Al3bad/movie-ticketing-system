@@ -3,7 +3,6 @@ import { constants } from "node:http2";
 import express from "express";
 import { cors } from "./backend/middlewares";
 import api from "./backend/api";
-import { initDB } from "./backend/dbQueries";
 
 export const httpStatus = {
   // 2xx
@@ -49,6 +48,5 @@ app.get("/*", (_, res) => {
 // ==> Start Listening
 // ==============================================
 app.listen(PORT, async () => {
-  await initDB();
   console.log(`Server is running on port ${PORT}`);
 });
