@@ -1,23 +1,33 @@
-## TODO
+# Description
 
-- [x] ~~BACKEND: Create new booking (POST /api/booking)~~
-- [x] ~~BACKEND: Get all movies (GET /api/movie)~~
-- [x] ~~BACKEND: Get all ticket types (GET /api/ticket)~~
+...
 
----
+# Commands
 
-- [ ] BACKEND: Get all bookings (GET /api/booking)
-- [ ] BACKEND: Get info of a single booking (GET /api/booking/<booking-id>)
-- [ ] BACKEND: Create new customer (POST /api/customer)
-- [ ] BACKEND: Get all customers (GET /api/customer)
-- [ ] BACKEND: Get info of a single customer (GET /api/customer/<customer-id>)
-- [ ] BACKEND: Edit info of a single customer (PUT /api/customer/<customer-id>)
-- [ ] BACKEND: Delete a single customer (DELETE /api/customer/<customer-id>)
-- [ ] BACKEND: Add new movie (POST /api/movie)
-- [ ] BACKEND: Get info of a single movie (GET /api/movie/<movie-id>)
-- [ ] BACKEND: Edit info of a single movie (PUT /api/movie/<movie-id>)
-- [ ] BACKEND: Delete a single movie (DELETE /api/movie/<movie-id>)
-- [ ] BACKEND: Add new ticket type (POST /api/ticket)
-- [ ] BACKEND: Get info of a single ticket type (GET /api/ticket/<ticket-id>)
-- [ ] BACKEND: Edit info of a single ticket type (PUT /api/ticket/<ticket-id>)
-- [ ] BACKEND: Delete a single ticket type (DELETE /api/ticket/<ticket-id>)
+| CMD                | Description                                     |
+| :----------------- | :---------------------------------------------- |
+| npm run dev        | Run development server for frontend             |
+| npm run dev:server | Run web server for backend                      |
+| npm run dev:all    | Run both froend & backend servers               |
+| npm run db:init    | Recreate all tables in DB & seed them with data |
+| npm run test       | Run test                                        |
+
+# Routes
+
+| Status | Route                       | Description           |
+| :----: | :-------------------------- | :-------------------- |
+| - [x]  | POST /api/booking           | Create new booking    |
+| - [ ]  | GET /api/booking            | Get all bookings      |
+| - [ ]  | GET /api/booking/\<id\>     | Get booking by id     |
+| - [ ]  | GET /api/customer/          | Get all customers     |
+| - [ ]  | GET /api/customer/\<id\>    | Get customer by id    |
+| - [ ]  | PUT /api/customer/\<id\>    | Edit customer info    |
+| - [ ]  | DELETE /api/customer/\<id\> | Delete customer       |
+| - [x]  | GET /api/movie/             | Get all movies        |
+| - [ ]  | GET /api/movie/\<id\>       | Get movie by id       |
+| - [ ]  | PUT /api/movie/\<id\>       | Edit moive info       |
+| - [ ]  | DELETE /api/movie/\<id\>    | Delete moive          |
+| - [x]  | GET /api/ticket/            | Get all ticket types  |
+| - [ ]  | GET /api/ticket/\<id\>      | Get ticket type by id |
+| - [ ]  | PUT /api/ticket/\<id\>      | Edit ticket type info |
+| - [ ]  | DELETE /api/ticket/\<id\>   | Delete ticket type    |
