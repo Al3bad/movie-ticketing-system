@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "dev:server": "ts-node --project ./tsconfig.node.json server.ts",
+    "dev:server": "ts-node server.ts",
     "dev:all": "concurrently 'npm run dev:server' 'npm run dev'",
-    "db:resetAndSeed": "ts-node --project ./tsconfig.node.json -r dotenv/config -e 'import db from \"./backend/db\"; db.resetAndSeed();'",
+    "db:resetAndSeed": "ts-node -r dotenv/config -e 'import db from \"./backend/db/db\"; db.resetAndSeed();'",
+    "test": "concurrently 'NODE_ENV=test npm run dev:server' 'NODE_ENV=test cypress open'",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -28,6 +29,7 @@
     "@typescript-eslint/parser": "^5.59.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
     "concurrently": "^8.2.0",
+    "cypress": "^12.16.0",
     "dotenv": "^16.3.1",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
@@ -36,7 +38,7 @@
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.0.2",
+    "typescript": "^5.1.6",
     "vite": "^4.3.9"
   }
 }
