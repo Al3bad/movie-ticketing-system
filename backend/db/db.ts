@@ -37,7 +37,7 @@ export class DB {
   };
 
   // ==============================================
-  // ==> Init DB
+  // ==> DB stuff
   // ==============================================
   createTables = async () => {
     try {
@@ -71,16 +71,16 @@ export class DB {
   };
 
   // Methods
-  async deleteDB() {
+  deleteDB = async () => {
     try {
       await fs.rm(this.dbDir);
-      console.log(dbName + " DB has been deleted!");
+      console.log(this.dbName + " DB has been deleted!");
     } catch (err: unknown) {
       process.exit(1);
     }
-  }
+  };
 
-  async resetDB() {
+  resetDB = async () => {
     console.log("Resetting DB ...");
     // console.log(this.dbDir);
     try {
@@ -91,24 +91,21 @@ export class DB {
       console.log("Couldn't reset DB!");
       process.exit(1);
     }
-  }
+  };
 
-  seedDB(seed?: number) {
+  seedDB = (seed?: number) => {
     console.log("Seeding DB ...");
     faker.seed(seed || 10);
     // list of movies
-    const movies: NewMovie[] = [
-      "Avatar",
-      "Frozen",
-      "Spiderman",
-      "John Wick",
-    ].map((title) => {
-      return {
-        title,
-        seatAvailable: faker.number.int({ min: 0, max: 60 }),
-        isReleased: faker.datatype.boolean(),
-      };
-    });
+    const movies: Movie[] = ["Avatar", "Frozen", "Spiderman", "John Wick"].map(
+      (title) => {
+        return {
+          title,
+          seatAvailable: faker.number.int({ min: 0, max: 60 }),
+          isReleased: faker.datatype.boolean(),
+        };
+      }
+    );
     movies.push({ title: "Test", seatAvailable: 50, isReleased: true });
 
     const tickets = [
@@ -163,6 +160,8 @@ export class DB {
         name: customers[0].name,
         email: customers[0].email,
         type: customers[0].type,
+        discountRate: customers[0].discountRate,
+        threshold: customers[0].threshold,
       },
       movie: movies.find((mv) => mv.seatAvailable > 5)?.title || "Test",
       tickets: [
@@ -170,9 +169,9 @@ export class DB {
         { type: "child", qty: 2 },
       ],
     });
-  }
+  };
 
-  createRandomCustomer() {
+  createRandomCustomer = () => {
     const randomType: CustomerType = faker.helpers.arrayElement([
       "Normal",
       "Flat",
@@ -198,18 +197,18 @@ export class DB {
       });
     }
     return customer;
-  }
+  };
 
-  async resetAndSeed(seed?: number) {
+  resetAndSeed = async (seed?: number) => {
     this.resetDB();
     await this.createTables();
     this.seedDB(seed);
-  }
+  };
 
   // ==============================================
   // ==> Movie Queries
   // ==============================================
-  insertMovie = (newMovie: NewMovie) => {
+  insertMovie = (newMovie: Movie) => {
     const { title, seatAvailable, isReleased } = newMovie;
 
     try {
@@ -223,17 +222,76 @@ export class DB {
     }
   };
 
-  getAllMovies = () => {
-    type EMoive = Omit<Movie, "isReleased">;
+  getAllMovies = (opt: {
+    onlyReleased?: boolean;
+    includeIsReleased?: boolean;
+  }) => {
+    type EMovie = Omit<Movie, "isReleased">;
     try {
-      const stmt = this.connection.prepare(
-        "SELECT title, seatAvailable FROM movie WHERE isReleased = true"
-      );
-      const data = stmt.all() as EMoive[];
-      return data;
+      return this.connection
+        .prepare(
+          `SELECT title, seatAvailable ${
+            opt.includeIsReleased ? ", isReleased" : ""
+          } FROM movie WHERE isReleased = ?`
+        )
+        .all(opt.onlyReleased ? 1 : 0) as Array<Movie | EMovie>;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      throw { error: this.dbErrorHandler(err) };
     }
+  };
+
+  getMoiveByTitle = (
+    title: string,
+    opt: {
+      onlyReleased?: boolean;
+      includeIsReleased?: boolean;
+    }
+  ) => {
+    type EMovie = Omit<Movie, "isReleased">;
+    try {
+      return this.connection
+        .prepare(
+          `SELECT title, seatAvailable ${
+            opt.includeIsReleased ? ", isReleased" : ""
+          } FROM movie WHERE title = ? AND isReleased = ?`
+        )
+        .get(title, opt.onlyReleased ? 1 : 0) as Movie | EMovie;
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  updateSeats = ({ title, qty }: RequestedSeats) => {
+    try {
+      return this.connection
+        .prepare(
+          "UPDATE movie SET seatAvailable = (SELECT seatAvailable FROM movie WHERE title = ?) - ? WHERE title = ?"
+        )
+        .run(title, qty, title);
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  updateMovie = ({
+    title,
+    seatAvailable = null,
+    isReleased = null,
+  }: UpdateMovie) => {
+    try {
+      return this.connection
+        .prepare(
+          "UPDATE movie SET title = IFNULL(?, title), seatAvailable = IFNULL(?, seatAvailable), isReleased = IFNULL(?, isReleased)"
+        )
+        .run(title, seatAvailable, isReleased);
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  deleteMovie = (title: string) => {
+    // TODO:
+    return title;
   };
 
   // ==============================================
@@ -249,7 +307,7 @@ export class DB {
       stmt.run(type, price);
       return newTicket;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      throw { error: this.dbErrorHandler(err) };
     }
   };
 
@@ -263,7 +321,7 @@ export class DB {
       stmt.run(type, component, qty);
       return newTicketComponent;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      throw { error: this.dbErrorHandler(err) };
     }
   };
 
@@ -287,176 +345,163 @@ export class DB {
       const data = stmt.all(groupTicketDiscount) as Ticket[];
       return data;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      throw { error: this.dbErrorHandler(err) };
     }
+  };
+
+  updateTicket = (ticket: UpdateTicket) => {
+    // TODO:
+    return ticket;
+  };
+
+  updateTicketComponent = (ticketComponent: TicketComponent) => {
+    // TODO:
+    return ticketComponent;
+  };
+
+  deleteTicket = (type: string) => {
+    // TODO:
+    return type;
   };
 
   // ==============================================
   // ==> Customer Queries
   // ==============================================
-  // TODO: type it properly
-  insertCustomer = (newCustomer: any) => {
-    const { email, name, type, discoundRate, threshold } = newCustomer;
+  insertCustomer = (newCustomer: Customer) => {
+    const { email, name, type } = newCustomer;
+
+    let discountRate = null;
+    let threshold = null;
+    if (newCustomer.type === "Step") {
+      if (!newCustomer.threshold)
+        throw Error("Threshold value is missing for reward step customer!");
+      threshold = newCustomer.threshold;
+    } else if (newCustomer.type !== "Normal") {
+      if (!newCustomer.discountRate) {
+        console.log(newCustomer);
+        throw Error(
+          "Discount rate value is missing for reward flat/step customer!"
+        );
+      }
+      discountRate = newCustomer.discountRate;
+    }
 
     try {
       const stmt = this.connection.prepare(
         "INSERT INTO customer(email, name, type, discountRate, threshold) VALUES (?,?,?,?,?)"
       );
-      stmt.run(email, name, type, discoundRate, threshold);
+      stmt.run(email, name, type, discountRate, threshold);
       return newCustomer;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      const customerExists =
+        this.connection.inTransaction &&
+        err instanceof SqliteError &&
+        err.code === "SQLITE_CONSTRAINT_PRIMARYKEY";
+      if (customerExists) {
+        return;
+      }
+      throw { error: this.dbErrorHandler(err) };
     }
+  };
+
+  getAllCustomer = () => {
+    try {
+      return this.connection
+        .prepare("SELECT * FROM customer")
+        .all() as Customer[];
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  getCustomerByEmail = (email: string) => {
+    try {
+      return this.connection
+        .prepare("SELECT * FROM customer WHERE email = ?")
+        .get(email) as Customer;
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  updateCustomer = (email: string) => {
+    // TODO:
+    return email;
+  };
+
+  deleteCustomer = (email: string) => {
+    // TODO:
+    return email;
   };
 
   // ==============================================
   // ==> Booking Queries
   // ==============================================
+  calculateRequestedTickets = (tickets: RequestedTicket[]) => {
+    // TODO: get quantiaty of GroupTicket components
+    return Object.entries(tickets).reduce(
+      (total, pair) => total + pair[1].qty,
+      0
+    );
+  };
+
   insertBooking = (newBooking: NewBooking) => {
     const { customer, movie, tickets } = newBooking;
-
-    // Create new customer, if not exists
     try {
+      // Start a inTransaction
       this.connection.prepare("BEGIN").run();
-      this.connection
-        .prepare("INSERT INTO customer(email, name, type) VALUES (?, ?, ?)")
-        .run(customer.email, customer.name, customer.type);
-    } catch (err: unknown) {
-      const error = this.dbErrorHandler(err);
-      if (
-        err instanceof SqliteError &&
-        err.code === "SQLITE_CONSTRAINT_PRIMARYKEY"
-      ) {
-        console.log("Customer already exists!");
-      } else {
-        this.connection.prepare("ROLLBACK").run();
-        return { error: error };
-      }
-    }
-
-    // Insert into booking table
-    const booking: { id?: number | bigint } = {};
-    try {
-      const info = this.connection
+      // Create new customer, if not exists
+      this.insertCustomer(customer);
+      const booking: { id?: number | bigint } = {};
+      // Insert into booking table
+      booking.id = this.connection
         .prepare("INSERT INTO booking(customerEmail, movieTitle) VALUES (?, ?)")
-        .run(customer.email, movie);
-      booking.id = info.lastInsertRowid;
-    } catch (err: unknown) {
-      if (err instanceof SqliteError) {
-        if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-          this.connection.prepare("ROLLBACK").run();
-          return {
-            error: {
-              type: "DB",
-              msg: err.message,
-            },
-          };
-        }
-      } else if (err instanceof Error) {
-        this.connection.prepare("ROLLBACK").run();
-        return {
-          error: {
-            type: "DB",
-            msg: err.message,
-          },
-        };
-      } else {
-        this.connection.prepare("ROLLBACK").run();
-        return {
-          error: {
-            type: "UNKNOWN",
-            msg: `Error occured in ${__filename}`,
-          },
-        };
-      }
-    }
-
-    // Update movies
-    try {
-      const totalTickets = Object.entries(tickets).reduce(
-        (total, pair) => total + pair[1].qty,
-        0
-      );
-
-      this.connection
-        .prepare(
-          "UPDATE movie SET seatAvailable = (SELECT seatAvailable FROM movie WHERE title = ?) - ? WHERE title = ?"
-        )
-        .run(movie, totalTickets, movie);
-    } catch (err: unknown) {
-      if (err instanceof SqliteError) {
-        if (err.code === "SQLITE_CONSTRAINT_CHECK") {
-          this.connection.prepare("ROLLBACK").run();
-          return {
-            error: {
-              type: "DB",
-              msg: "The number of requested seats exceeds the seats available!",
-            },
-          };
-        }
-      } else if (err instanceof Error) {
-        this.connection.prepare("ROLLBACK").run();
-        return {
-          error: {
-            type: "DB",
-            msg: err.message,
-          },
-        };
-      } else {
-        this.connection.prepare("ROLLBACK").run();
-        return {
-          error: {
-            type: "UNKNOWN",
-            msg: `Error occured in ${__filename}`,
-          },
-        };
-      }
-    }
-
-    // Insert puchased tickets into "purchased ticket" table
-    for (const { type, qty } of tickets) {
-      try {
+        .run(customer.email, movie).lastInsertRowid;
+      // Update movies
+      this.updateSeats({
+        title: movie,
+        qty: this.calculateRequestedTickets(tickets),
+      });
+      // Insert puchased tickets into "purchased ticket" table
+      for (const { type, qty } of tickets) {
         this.connection
           .prepare(
             "INSERT INTO purchasedTicket (bookingId, ticketType, qty) VALUES (?,?,?)"
           )
           .run(booking.id, type, qty);
-      } catch (err: unknown) {
-        if (err instanceof SqliteError) {
-          if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-            this.connection.prepare("ROLLBACK").run();
-            return {
-              error: {
-                type: "DB",
-                msg: err.message,
-              },
-            };
-          }
-        } else if (err instanceof Error) {
-          this.connection.prepare("ROLLBACK").run();
-          return {
-            error: {
-              type: "DB",
-              msg: err.message,
-            },
-          };
-        } else {
-          this.connection.prepare("ROLLBACK").run();
-          return {
-            error: {
-              type: "UNKNOWN",
-              msg: `Error occured in ${__filename}`,
-            },
-          };
-        }
       }
+      // Commit transaction then return
+      this.connection.prepare("COMMIT").run();
+      return {
+        id: booking.id,
+        ...newBooking,
+      };
+    } catch (err: unknown) {
+      this.connection.prepare("ROLLBACK").run();
+      throw { error: this.dbErrorHandler(err) };
     }
-    this.connection.prepare("COMMIT").run();
-    return {
-      id: booking.id,
-      ...newBooking,
-    };
   };
+
+  getAllBooking = () => {
+    try {
+      return this.connection.prepare("SELECT * FROM booking").all() as Array<
+        NormalCustomer | FlatCustomer | StepCustomer
+      >;
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
+  getBookingById = (id: number) => {
+    try {
+      return this.connection
+        .prepare("SELECT * FROM booking WHERE id = ?")
+        .get(id) as Array<NormalCustomer | FlatCustomer | StepCustomer>;
+    } catch (err: unknown) {
+      throw { error: this.dbErrorHandler(err) };
+    }
+  };
+
   // ==============================================
   // ==> Error Handling
   // ==============================================

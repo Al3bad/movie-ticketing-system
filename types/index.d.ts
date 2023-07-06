@@ -10,14 +10,21 @@ type Modify<T, R> = Omit<T, keyof R> & R;
 // --> Movie types
 // ==============================================
 
-type NewMovie = {
+type Movie = {
   title: string;
   seatAvailable: number;
   isReleased: boolean;
 };
 
-type Movie = NewMovie & {
-  id: number;
+type UpdateMovie = {
+  title: string;
+  seatAvailable: number | null;
+  isReleased: boolean | null;
+};
+
+type RequestedSeats = {
+  title: string;
+  qty: number;
 };
 
 // ==============================================
@@ -30,6 +37,14 @@ type NewTicket = {
 };
 
 type Ticket = Required<NewTicket> & { qty: number };
+
+type UpdateTicket = Modify<
+  Ticket,
+  {
+    price?: number | null;
+    qty?: number | null;
+  }
+>;
 
 type RequestedTicket = {
   type: string;
@@ -55,9 +70,10 @@ type NewGroupTicket = GroupTicket;
 // ==============================================
 
 type CustomerType = "Normal" | "Flat" | "Step";
+type Customer = NormalCustomer | FlatCustomer | StepCustomer;
 
 type NormalCustomer = {
-  id?: number;
+  // id?: number;
   name: string;
   email: string;
   type: "Normal";
@@ -87,7 +103,7 @@ type NewBooking = {
   // email: string;
   // name: string;
   // type: CustomerType;
-  customer: NormalCustomer | FlatCustomer | StepCustomer;
+  customer: Customer;
   movie: string;
   tickets: RequestedTicket[];
 };

@@ -4,16 +4,19 @@ import db from "backend/db/db";
 import { httpStatus } from "server";
 
 export const getAllMovies = (_: Request, res: Response) => {
-  const movies = db.getAllMovies();
-  if (movies instanceof Array) {
+  try {
+    const movies = db.getAllMovies({
+      onlyReleased: true,
+      includeIsReleased: false,
+    });
     return res.status(httpStatus.OK).json(movies);
-  } else {
+  } catch (err: any) {
     return res
       .status(
-        movies.error.type === "DB"
+        err.error.type === "DB"
           ? httpStatus.BAD_REQUEST
           : httpStatus.INTERNAL_SERVER_ERROR
       )
-      .json({ error: { msg: movies.error.msg } });
+      .json({ error: { msg: err.error.msg } });
   }
 };

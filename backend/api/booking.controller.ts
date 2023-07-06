@@ -9,18 +9,18 @@ export const createBooking = (req: Request, res: Response) => {
   const result = NewBookingSchema.safeParse(req.body);
 
   if (result.success) {
-    // call function to insert data in db
-    const booking = db.insertBooking(result.data);
-    if (booking.error) {
+    try {
+      // call function to insert data in db
+      const booking = db.insertBooking(result.data);
+      return res.status(httpStatus.CREATED).json(booking);
+    } catch (err: any) {
       return res
         .status(
-          booking.error.type === "DB"
+          err.error.type === "DB"
             ? httpStatus.BAD_REQUEST
             : httpStatus.INTERNAL_SERVER_ERROR
         )
-        .json({ error: { msg: booking.error.msg } });
-    } else {
-      return res.status(httpStatus.CREATED).json(booking);
+        .json({ error: { msg: err.error.msg } });
     }
   } else {
     // if there is a problem -> res with an error
