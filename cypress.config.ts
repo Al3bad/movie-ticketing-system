@@ -3,6 +3,8 @@ import { defineConfig } from "cypress";
 import db from "backend/db/db";
 
 export default defineConfig({
+  screenshotsFolder: false,
+  video: false,
   env: {
     apiUrl: process.env.BASE_URL + "/api",
   },

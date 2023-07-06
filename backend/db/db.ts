@@ -24,11 +24,12 @@ export class DB {
 
   init = async () => {
     console.log("DB Name: " + this.dbName);
-    this.dropAll();
     await this.createTables();
-    this.seedDB(10);
     console.log("DB is ready!");
     if (process.env.NODE_ENV === "test") {
+      this.dropAll();
+      await this.createTables();
+      this.seedDB(10);
       process.on("SIGINT", () => this.deleteDB());
       process.on("beforeExit", () => this.deleteDB());
       process.on("exit", () => this.deleteDB());
@@ -135,28 +136,26 @@ export class DB {
       .map((_) => this.createRandomCustomer());
 
     movies.forEach((movie) => {
-      console.log(this.insertMovie(movie));
+      this.insertMovie(movie);
     });
 
     tickets.forEach((ticket) => {
       if (ticket.components) {
-        console.log(this.insertTicket(ticket));
+        this.insertTicket(ticket);
         ticket.components.forEach((c) =>
-          console.log(
-            this.insertTicketComponent({
-              type: ticket.type,
-              component: c.component,
-              qty: c.qty,
-            })
-          )
+          this.insertTicketComponent({
+            type: ticket.type,
+            component: c.component,
+            qty: c.qty,
+          })
         );
       } else {
-        console.log(this.insertTicket(ticket));
+        this.insertTicket(ticket);
       }
     });
 
     customers.forEach((customer) => {
-      console.log(this.insertCustomer(customer));
+      this.insertCustomer(customer);
     });
 
     this.insertBooking({
