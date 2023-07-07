@@ -5,12 +5,18 @@ import * as controller from "./booking.controller";
 // ==> Define Routes
 // ==============================================
 const routes: Backend.Route[] = [
-  // {
-  //   method: "get",
-  //   endpoint: "/",
-  //   description: "Get all bookings",
-  //   controller: controller.getAllBookings,
-  // },
+  {
+    method: "get",
+    endpoint: "/",
+    description: "Get all bookings",
+    controller: controller.getAllBookings,
+  },
+  {
+    method: "get",
+    endpoint: "/:id",
+    description: "Get booking by id",
+    controller: controller.getBookingById,
+  },
   {
     method: "post",
     endpoint: "/",

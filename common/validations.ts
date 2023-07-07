@@ -64,7 +64,7 @@ export const NewBookingSchema = z.object({
     FlatCustomerSchema,
     StepCustomerSchema,
   ]),
-  movie: z.string(),
+  title: z.string(),
   tickets: z.array(TicketSchema).min(1),
 });
 

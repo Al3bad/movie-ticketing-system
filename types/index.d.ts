@@ -104,7 +104,7 @@ type NewBooking = {
   // name: string;
   // type: CustomerType;
   customer: Customer;
-  movie: string;
+  title: string;
   tickets: RequestedTicket[];
 };
 

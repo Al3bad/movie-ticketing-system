@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS booking (
 CREATE TABLE IF NOT EXISTS purchasedTicket (
     bookingId INTEGER NOT NULL,
     ticketType TEXT NOT NULL,
+    ticketprice REAL NOT NULL,
     qty INTEGER NOT NULL,
     -- Composite PK
     PRIMARY KEY (bookingId, ticketType),

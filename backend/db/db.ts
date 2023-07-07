@@ -163,7 +163,7 @@ export class DB {
         discountRate: customers[0].discountRate,
         threshold: customers[0].threshold,
       },
-      movie: movies.find((mv) => mv.seatAvailable > 5)?.title || "Test",
+      title: movies.find((mv) => mv.seatAvailable > 5)?.title || "Test",
       tickets: [
         { type: "adult", qty: 1 },
         { type: "child", qty: 2 },
@@ -446,7 +446,7 @@ export class DB {
   };
 
   insertBooking = (newBooking: NewBooking) => {
-    const { customer, movie, tickets } = newBooking;
+    const { customer, title, tickets } = newBooking;
     try {
       // Start a inTransaction
       this.connection.prepare("BEGIN").run();
@@ -456,26 +456,32 @@ export class DB {
       // Insert into booking table
       booking.id = this.connection
         .prepare("INSERT INTO booking(customerEmail, movieTitle) VALUES (?, ?)")
-        .run(customer.email, movie).lastInsertRowid;
+        .run(customer.email, title).lastInsertRowid;
       // Update movies
       this.updateSeats({
-        title: movie,
+        title: title,
         qty: this.calculateRequestedTickets(tickets),
       });
       // Insert puchased tickets into "purchased ticket" table
       for (const { type, qty } of tickets) {
         this.connection
           .prepare(
-            "INSERT INTO purchasedTicket (bookingId, ticketType, qty) VALUES (?,?,?)"
+            `INSERT INTO purchasedTicket (bookingId, ticketType, ticketPrice, qty)
+            VALUES (?,?,(SELECT IFNULL(t.price, SUM(t2.price) * 0.8) AS price
+                        FROM ticket t
+                        LEFT JOIN ticketComponent tc
+                            ON t.type = tc.type
+                        LEFT JOIN ticket t2
+                            ON tc.component = t2.type
+                        WHERE t.type = ?),
+                    ?)`
           )
-          .run(booking.id, type, qty);
+          .run(booking.id, type, type, qty);
       }
       // Commit transaction then return
+      const result = this.getBookingById(booking.id);
       this.connection.prepare("COMMIT").run();
-      return {
-        id: booking.id,
-        ...newBooking,
-      };
+      return result;
     } catch (err: unknown) {
       this.connection.prepare("ROLLBACK").run();
       throw { error: this.dbErrorHandler(err) };
@@ -484,19 +490,52 @@ export class DB {
 
   getAllBooking = () => {
     try {
-      return this.connection.prepare("SELECT * FROM booking").all() as Array<
-        NormalCustomer | FlatCustomer | StepCustomer
-      >;
+      return this.connection
+        .prepare(
+          `SELECT b.id, c.*,
+                b.movieTitle AS title,
+                pt.ticketType, pt.ticketprice, pt.qty,
+                tc.component, tc.qty AS componentTicketQty
+          FROM booking b
+          JOIN customer c
+              ON b.customerEmail = c.email
+          JOIN purchasedTicket pt
+              ON b.id = pt.bookingId
+          -- Get components of group tickets (if any)
+          LEFT JOIN ticketComponent tc
+              ON pt.ticketType = tc.type
+          -- Get price of single tickets
+          LEFT JOIN ticket singleTicket
+              on pt.ticketType = singleTicket.type`
+        )
+        .all();
     } catch (err: unknown) {
       throw { error: this.dbErrorHandler(err) };
     }
   };
 
-  getBookingById = (id: number) => {
+  getBookingById = (id: number | bigint) => {
     try {
       return this.connection
-        .prepare("SELECT * FROM booking WHERE id = ?")
-        .get(id) as Array<NormalCustomer | FlatCustomer | StepCustomer>;
+        .prepare(
+          `SELECT b.id, c.*,
+                b.movieTitle AS title,
+                pt.ticketType, pt.ticketprice, pt.qty,
+                tc.component, tc.qty AS componentTicketQty
+          FROM booking b
+          JOIN customer c
+              ON b.customerEmail = c.email
+          JOIN purchasedTicket pt
+              ON b.id = pt.bookingId
+          -- Get components of group tickets (if any)
+          LEFT JOIN ticketComponent tc
+              ON pt.ticketType = tc.type
+          -- Get price of single tickets
+          LEFT JOIN ticket singleTicket
+              on pt.ticketType = singleTicket.type
+          WHERE b.id = ?`
+        )
+        .all(id);
     } catch (err: unknown) {
       throw { error: this.dbErrorHandler(err) };
     }
