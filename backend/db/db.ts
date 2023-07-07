@@ -25,7 +25,6 @@ export class DB {
   init = async () => {
     console.log("DB Name: " + this.dbName);
     await this.createTables();
-    console.log("DB is ready!");
     if (process.env.NODE_ENV === "test") {
       this.dropAll();
       await this.createTables();
@@ -46,7 +45,6 @@ export class DB {
         "utf8"
       );
       this.connection.exec(createTablesQueries);
-      console.log("DB is initialised!");
     } catch (err: unknown) {
       console.log("[ERROR] Couldn't read the sql file to init the DB");
       process.exit(1);
@@ -64,7 +62,6 @@ export class DB {
         if (table?.name)
           this.connection.prepare("DROP TABLE IF EXISTS " + table.name).run();
       });
-      console.log("All tables dropped!");
     } catch (err: unknown) {
       return { error: this.dbErrorHandler(err) };
     }
@@ -74,19 +71,15 @@ export class DB {
   deleteDB = async () => {
     try {
       await fs.rm(this.dbDir);
-      console.log(this.dbName + " DB has been deleted!");
     } catch (err: unknown) {
       process.exit(1);
     }
   };
 
   resetDB = async () => {
-    console.log("Resetting DB ...");
-    // console.log(this.dbDir);
     try {
       this.dropAll();
       this.connection = new SQLite3(this.dbDir);
-      console.log("Reset DB is done!");
     } catch (err: unknown) {
       console.log("Couldn't reset DB!");
       process.exit(1);
@@ -94,7 +87,6 @@ export class DB {
   };
 
   seedDB = (seed?: number) => {
-    console.log("Seeding DB ...");
     faker.seed(seed || 10);
     // list of movies
     const movies: Movie[] = ["Avatar", "Frozen", "Spiderman", "John Wick"].map(
@@ -128,9 +120,23 @@ export class DB {
       },
     ];
 
+    const flatCustomerDiscountRate = faker.number.float({
+      precision: 0.01,
+    });
+    const stepCustomerThreshold = faker.number.float({
+      min: 10,
+      max: 80,
+      precision: 0.01,
+    });
+
     const customers = new Array(10)
       .fill(0)
-      .map((_) => this.createRandomCustomer());
+      .map((_) =>
+        this.createRandomCustomer(
+          flatCustomerDiscountRate,
+          stepCustomerThreshold
+        )
+      );
 
     movies.forEach((movie) => {
       this.insertMovie(movie);
@@ -171,7 +177,10 @@ export class DB {
     });
   };
 
-  createRandomCustomer = () => {
+  createRandomCustomer = (
+    flatCustomerDiscountRate: number,
+    stepCustomerThreshold: number
+  ) => {
     const randomType: CustomerType = faker.helpers.arrayElement([
       "Normal",
       "Flat",
@@ -182,17 +191,12 @@ export class DB {
       email: faker.internet.email({ provider: "test.dev" }),
       type: randomType,
     };
-    if (customer.type !== "Normal") {
-      customer.discountRate = faker.number.float({
-        min: 0.0,
-        max: 0.9,
-        precision: 0.1,
-      });
+    if (customer.type === "Flat") {
+      customer.discountRate = flatCustomerDiscountRate;
     }
     if (customer.type === "Step") {
-      customer.threshold = faker.number.float({
-        min: 10,
-        max: 80,
+      customer.threshold = stepCustomerThreshold;
+      customer.discountRate = faker.number.float({
         precision: 0.01,
       });
     }
@@ -376,9 +380,9 @@ export class DB {
       if (!newCustomer.threshold)
         throw Error("Threshold value is missing for reward step customer!");
       threshold = newCustomer.threshold;
-    } else if (newCustomer.type !== "Normal") {
+    }
+    if (newCustomer.type !== "Normal") {
       if (!newCustomer.discountRate) {
-        console.log(newCustomer);
         throw Error(
           "Discount rate value is missing for reward flat/step customer!"
         );
@@ -404,20 +408,31 @@ export class DB {
     }
   };
 
-  getAllCustomer = () => {
+  getCustomers = ({
+    page,
+    limit,
+  }: {
+    page?: number;
+    limit?: number;
+  }): Customer[] => {
     try {
-      return this.connection
-        .prepare("SELECT * FROM customer")
-        .all() as Customer[];
+      let stmt = "SELECT * FROM customer";
+      if (typeof limit === "number") stmt += " LIMIT @limit";
+      if (typeof page === "number") stmt += " OFFSET @page";
+      return this.connection.prepare(stmt).all({ page, limit }) as Customer[];
     } catch (err: unknown) {
       throw { error: this.dbErrorHandler(err) };
     }
   };
 
+  getAllCustomers = (): Customer[] => {
+    return this.getCustomers({});
+  };
+
   getCustomerByEmail = (email: string) => {
     try {
       return this.connection
-        .prepare("SELECT * FROM customer WHERE email = ?")
+        .prepare("SELECT * FROM customer WHERE LOWER(email) = LOWER(?)")
         .get(email) as Customer;
     } catch (err: unknown) {
       throw { error: this.dbErrorHandler(err) };

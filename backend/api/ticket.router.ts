@@ -11,11 +11,6 @@ const routes: Backend.Route[] = [
     description: "Get all available ticket types",
     controller: controller.getAllTickets,
   },
-  {
-    method: "get",
-    endpoint: "/help",
-    description: "Get list of endpoints available for /api/ticket route",
-  },
 ];
 
 export default initRouter("/api/ticket", routes);

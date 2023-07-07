@@ -120,7 +120,19 @@ declare namespace Backend {
   type Route = {
     method: "get" | "post" | "put" | "delete";
     endpoint: string;
-    description: string;
-    controller?: any;
+    description?: string;
+    parameters?: Array<{
+      name: string;
+      type: "string" | "integer" | "number";
+      description: string;
+      required?: boolean;
+    }>;
+    query?: Array<{
+      name: string;
+      type: "string" | "integer" | "number";
+      description: string;
+      required?: boolean;
+    }>;
+    controller: any;
   };
 }

@@ -7,6 +7,8 @@
     "dev:server": "ts-node server.ts",
     "dev:all": "concurrently 'npm run dev:server' 'npm run dev'",
     "db:init": "ts-node -r dotenv/config -e 'import \"./backend/db/db\";'",
+    "db:reset": "ts-node -r dotenv/config -e 'import db from \"./backend/db/db\"; db.resetDB()'",
+    "db:seed": "ts-node -r dotenv/config -e 'import db from \"./backend/db/db\"; db.seedDB(10)'",
     "test": "concurrently 'NODE_ENV=test npm run dev:server' 'NODE_ENV=test cypress run --component'",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
