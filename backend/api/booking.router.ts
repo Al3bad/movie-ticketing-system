@@ -23,11 +23,6 @@ const routes: Backend.Route[] = [
     description: "Create new booking",
     controller: controller.createBooking,
   },
-  {
-    method: "get",
-    endpoint: "/help",
-    description: "Get list of endpoints available for /api/booking route",
-  },
 ];
 
 export default initRouter("/api/booking", routes);

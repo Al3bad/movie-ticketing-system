@@ -1,6 +1,7 @@
 import { NewBookingSchema } from "@/common/validations";
 // import { insertBooking } from "backend/db/dbQueries";
 import db from "backend/db/db";
+import { formatBooking, formatBookings } from "backend/utils";
 import { Request, Response } from "express";
 import { httpStatus } from "server";
 import zod from "zod";
@@ -34,96 +35,6 @@ export const createBooking = (req: Request, res: Response) => {
   }
 };
 
-const formatBookings = (bookings: any) => {
-  return [...new Set(bookings.map((b: any) => b.id))].map((id) => {
-    return formatBooking(
-      bookings.filter((currBooking: any) => currBooking.id === id)
-    );
-  });
-};
-
-const formatBooking = (
-  booking: {
-    id: number;
-    email: string;
-    name: string;
-    type: CustomerType;
-    discountRate?: number | null;
-    threshold?: number | null;
-    title: string;
-    ticketType: string;
-    ticketPrice: number;
-    qty: number;
-    component: string | null;
-    componentTicketQty: number | null;
-  }[]
-) => {
-  const { id, email, name, type, title, discountRate, threshold } = booking[0];
-  const formattedBooking: {
-    id: number;
-    customer: Modify<
-      NormalCustomer,
-      { type: CustomerType; discountRate?: number; threshold?: number }
-    >;
-    title: string;
-    tickets: Ticket[];
-  } = {
-    id: id,
-    customer: {
-      email: email,
-      name: name,
-      type: type,
-    },
-    title: title,
-    tickets: [],
-  };
-  if (discountRate !== null && type !== "Normal") {
-    formattedBooking.customer.discountRate = discountRate;
-  }
-  if (threshold !== null && type === "Step") {
-    formattedBooking.customer.threshold = threshold;
-  }
-
-  // Group tickets
-  const groupTickets: Array<{
-    type: string;
-    price: number;
-    qty: number;
-    components: Omit<TicketComponent, "component">[];
-  }> = [];
-  booking
-    .filter((t) => t.component !== null && t.componentTicketQty !== null)
-    .forEach((t) => {
-      const groupTicketIdx = groupTickets.findIndex(
-        (processingTicket) => processingTicket.type === t.ticketType
-      );
-      if (groupTicketIdx === -1 && t.component && t.componentTicketQty) {
-        groupTickets.push({
-          type: t.ticketType,
-          price: t.ticketPrice,
-          qty: t.qty,
-          components: [{ type: t.component, qty: t.componentTicketQty }],
-        });
-      } else if (groupTicketIdx !== -1 && t.component && t.componentTicketQty) {
-        groupTickets[groupTicketIdx].components.push({
-          type: t.component,
-          qty: t.componentTicketQty,
-        });
-      }
-    });
-
-  // Signal tickets
-  const singleTickets = booking
-    .filter((t) => t.component === null)
-    .map((t) => {
-      return { type: t.ticketType, price: t.ticketPrice, qty: t.qty };
-    });
-
-  formattedBooking.tickets.push(...singleTickets, ...groupTickets);
-
-  return formattedBooking;
-};
-
 export const getAllBookings = (_: Request, res: Response) => {
   try {
     const bookings = db.getAllBooking();
@@ -150,7 +61,7 @@ export const getBookingById = (req: Request, res: Response) => {
 
   try {
     const booking = db.getBookingById(idNumber.data);
-    if (!booking) {
+    if (!booking || booking.length === 0) {
       return res.status(httpStatus.NOT_FOUND).json({});
     }
     return res.status(httpStatus.OK).json(formatBooking(booking as any));

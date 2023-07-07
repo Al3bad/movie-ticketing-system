@@ -40,15 +40,6 @@ describe("/api/movie", () => {
       ]);
   });
 
-  it("GET /help - Returns help object (routes)", () => {
-    cy.request({
-      url: apiUrl + "/movie/help",
-      method: "GET",
-    })
-      .its("body")
-      .should("have.property", "routes");
-  });
-
   it("GET /notFound - Returns Not Found with help body", () => {
     cy.request({
       url: apiUrl + "/movie/notFound",
