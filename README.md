@@ -17,8 +17,8 @@
 | Status | Route                       | Description           |
 | :----: | :-------------------------- | :-------------------- |
 | - [x]  | POST /api/booking           | Create new booking    |
-| - [ ]  | GET /api/booking            | Get all bookings      |
-| - [ ]  | GET /api/booking/\<id\>     | Get booking by id     |
+| - [x]  | GET /api/booking            | Get all bookings      |
+| - [x]  | GET /api/booking/\<id\>     | Get booking by id     |
 | - [ ]  | GET /api/customer/          | Get all customers     |
 | - [ ]  | GET /api/customer/\<id\>    | Get customer by id    |
 | - [ ]  | PUT /api/customer/\<id\>    | Edit customer info    |
