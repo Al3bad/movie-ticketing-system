@@ -8,13 +8,21 @@ type ButtonProps = {
   children?: any;
 };
 
-const Button: React.FC<ButtonProps> = ({children, label, classLabels, onButtonClick, ...btnAttr}) => {
-  const classes = classLabels.map((label) => styles[`button--${label}`]).join(" ");
+const Button: React.FC<ButtonProps> = ({
+  children,
+  label,
+  classLabels,
+  onButtonClick,
+  ...btnAttr
+}) => {
+  const classes = classLabels
+    .map((label) => styles[`button--${label}`])
+    .join(" ");
   const buttonClickHandler = () => {
     if (onButtonClick) {
       onButtonClick(label);
     }
-  }
+  };
   return (
     <button
       {...btnAttr}

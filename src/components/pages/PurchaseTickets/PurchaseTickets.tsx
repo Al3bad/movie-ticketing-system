@@ -57,58 +57,63 @@ const PurchaseTickets = () => {
 
   useEffect(() => {
     // Fetch Movies on Page Load
-    fetchMovies()
-      .then((movies) => {
-        console.log("movies", movies);
-        const movieOptions = movies.map((movie: Movie) => {
-          return { ...movies, id: movie.title, value: movie.title };
-        });
-        setData((currentData) => {
-          return {
-            ...currentData,
-            movies: movieOptions,
-          };
-        });
-      })
-      .catch((error) => console.log(error));
+    fetchMovieHandler();
 
     // Fetch Ticket Types on Page Load
-    fetchTickets()
-      .then((tickets) => {
-        console.log("tickets", tickets);
-        const ticketOptions = tickets.map((ticket: NewTicket) => {
-          return {
-            ...ticket,
-            id: ticket.type,
-            value: ticket.type,
-          };
-        });
-        setData((currentData) => {
-          return {
-            ...currentData,
-            ticketTypes: ticketOptions,
-          };
-        });
-      })
-      .catch((error) => console.log(error));
+    fetchTicketHandler();
   }, []);
 
+  const fetchMovieHandler = async () => {
+    const movies = await fetchMovies();
+    if (movies) {
+      // console.log("movies", movies);
+      const movieOptions = movies.map((movie: Movie) => {
+        return { ...movies, id: movie.title, value: movie.title };
+      });
+      setData((currentData) => {
+        return {
+          ...currentData,
+          movies: movieOptions,
+        };
+      });
+    }
+  };
+
+  const fetchTicketHandler = async () => {
+    const tickets = await fetchTickets();
+    if (tickets) {
+      // console.log("tickets", tickets);
+      const ticketOptions = tickets.map((ticket: NewTicket) => {
+        return {
+          ...ticket,
+          id: ticket.type,
+          value: ticket.type,
+        };
+      });
+      setData((currentData) => {
+        return {
+          ...currentData,
+          ticketTypes: ticketOptions,
+        };
+      });
+    }
+  };
+
   // TO DO: Check customer response in the case of new customer
-  const fetchCustomerHandler = () => {
+  const fetchCustomerHandler = async () => {
     // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
     if (data["customer-email-input"]) {
-      fetchCustomerByEmail(data["customer-email-input"])
-        .then((customer) => {
-          // TO DO: transform data based on reponse from Backend before setCustomer
-          setData((currentVals) => {
-            return {
-              ...currentVals,
-              customer: customer,
-            };
-          });
-        })
-        .catch((error) => console.log(error));
+      const customer = await fetchCustomerByEmail(data["customer-email-input"]);
+      if (customer) {
+        // TO DO: transform data based on reponse from Backend before setCustomer
+        setData((currentVals) => {
+          return {
+            ...currentVals,
+            customer: customer,
+          };
+        });
+      }
     }
   };
 
