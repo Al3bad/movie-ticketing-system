@@ -14,20 +14,22 @@
 
 # Routes
 
-| Status | Route                          | Description           |
-| :----: | :----------------------------- | :-------------------- |
-| - [x]  | POST /api/booking              | Create new booking    |
-| - [x]  | GET /api/booking               | Get all bookings      |
-| - [x]  | GET /api/booking/\<id\>        | Get booking by id     |
-| - [x]  | GET /api/customer/             | Get all customers     |
-| - [x]  | GET /api/customer/\<email\>    | Get customer by email |
-| - [ ]  | PUT /api/customer/\<email\>    | Edit customer info    |
-| - [ ]  | DELETE /api/customer/\<email\> | Delete customer       |
-| - [x]  | GET /api/movie/                | Get all movies        |
-| - [ ]  | GET /api/movie/\<id\>          | Get movie by id       |
-| - [ ]  | PUT /api/movie/\<id\>          | Edit moive info       |
-| - [ ]  | DELETE /api/movie/\<id\>       | Delete moive          |
-| - [x]  | GET /api/ticket/               | Get all ticket types  |
-| - [ ]  | GET /api/ticket/\<id\>         | Get ticket type by id |
-| - [ ]  | PUT /api/ticket/\<id\>         | Edit ticket type info |
-| - [ ]  | DELETE /api/ticket/\<id\>      | Delete ticket type    |
+| Status | Route                          | Description                          |
+| :----: | :----------------------------- | :----------------------------------- |
+|   􀃲    | POST /api/booking              | Create new booking                   |
+|   􀃲    | GET /api/booking               | Get all bookings                     |
+|   􀃲    | GET /api/booking/\<id\>        | Get booking by id                    |
+|   􀃲    | GET /api/customer/             | Get all customers                    |
+|   􀃲    | POST /api/customer/            | Create new customer                  |
+|   􀃲    | GET /api/customer/\<email\>    | Get customer by email                |
+|   􀃲    | PUT /api/customer/\<email\>    | Edit customer info                   |
+|   􀃲    | PUT /api/customer/             | Update all reward flat/step customer |
+|        | DELETE /api/customer/\<email\> | Delete customer                      |
+|   􀃲    | GET /api/movie/                | Get all movies                       |
+|        | GET /api/movie/\<id\>          | Get movie by id                      |
+|        | PUT /api/movie/\<id\>          | Edit moive info                      |
+|        | DELETE /api/movie/\<id\>       | Delete moive                         |
+|   􀃲    | GET /api/ticket/               | Get all ticket types                 |
+|        | GET /api/ticket/\<id\>         | Get ticket type by id                |
+|        | PUT /api/ticket/\<id\>         | Edit ticket type info                |
+|        | DELETE /api/ticket/\<id\>      | Delete ticket type                   |

@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import * as z from "zod";
 import db from "backend/db/db";
 import { httpStatus } from "server";
-import { NewCustomerSchema } from "@/common/validations";
+import {
+  NewCustomerSchema,
+  UpdateCustomerSchema,
+  UpdateCustomersSchema,
+} from "@/common/validations";
 
 export const getCustomers = (req: Request, res: Response) => {
   const { page, limit } = req.query;
@@ -50,9 +54,41 @@ export const getCustomerByEmail = (req: Request, res: Response) => {
 
 export const createCustomer = (req: Request, res: Response) => {
   try {
-    const body = NewCustomerSchema.parse(req.body);
-    const result = db.insertCustomer(body);
+    const newCustomer = NewCustomerSchema.parse(req.body);
+    const result = db.insertCustomer(newCustomer);
     return res.status(httpStatus.CREATED).json(result);
+  } catch (err: unknown) {
+    console.log(err);
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something wrong happends!" } });
+  }
+};
+
+export const updateCustomer = (req: Request, res: Response) => {
+  try {
+    console.log(req.body, req.params);
+    const email = z.string().email().parse(req.params.email);
+    const newCustomerInfo = UpdateCustomerSchema.parse(req.body);
+    const updatedCustomer = db.updateCustomer(email, newCustomerInfo);
+    return res.status(httpStatus.OK).json(updatedCustomer);
+  } catch (err: unknown) {
+    console.log(err);
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something wrong happends!" } });
+  }
+};
+
+export const updateCustomers = (req: Request, res: Response) => {
+  try {
+    const newInfo = UpdateCustomersSchema.parse(req.body);
+    if (newInfo.type === "Flat") {
+      db.updateDiscountRate(newInfo.discountRate);
+    } else {
+      db.updateThreshold(newInfo.threshold);
+    }
+    return res.status(httpStatus.OK).json({ updated: true });
   } catch (err: unknown) {
     console.log(err);
     return res

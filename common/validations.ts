@@ -58,6 +58,42 @@ export const NewCustomerSchema = z.union([
   StepCustomerSchema,
 ]);
 
+export const UpdateCustomerSchema = z
+  .object({
+    newEmail: z.string().email().optional().nullable().default(null),
+    name: z.string().optional().nullable().default(null),
+    type: z.literal("Normal"),
+  })
+  .or(
+    z.object({
+      newEmail: z.string().email().optional().nullable().default(null),
+      name: z.string().optional().nullable().default(null),
+      type: z.literal("Flat"),
+      discountRate: z.number().gt(0).lte(1).optional().nullable().default(null),
+    })
+  )
+  .or(
+    z.object({
+      newEmail: z.string().email().optional().nullable().default(null),
+      name: z.string().optional().nullable().default(null),
+      type: z.literal("Step"),
+      discountRate: z.number().gt(0).lte(1).optional().nullable().default(null),
+      threshold: z.number().positive().optional().nullable().default(null),
+    })
+  );
+
+export const UpdateCustomersSchema = z
+  .object({
+    type: z.literal("Flat"),
+    discountRate: z.number().gt(0).lte(1),
+  })
+  .or(
+    z.object({
+      type: z.literal("Step"),
+      threshold: z.number().positive(),
+    })
+  );
+
 // ==============================================
 // --> Booking schemas
 // ==============================================

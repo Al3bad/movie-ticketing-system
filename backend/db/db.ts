@@ -1,7 +1,9 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import { UpdateCustomerSchema } from "@/common/validations";
 import { faker } from "@faker-js/faker";
 import SQLite3, { Database, SqliteError } from "better-sqlite3";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { z } from "zod";
 
 let dbName = process.env.DB_NAME || "database.db";
 if (process.env.NODE_ENV === "test") {
@@ -439,9 +441,54 @@ export class DB {
     }
   };
 
-  updateCustomer = (email: string) => {
-    // TODO:
-    return email;
+  updateCustomer = (
+    customerEmail: string,
+    newCustoemrInfo: z.infer<typeof UpdateCustomerSchema>
+  ) => {
+    // NOTE: as of now, customer cannot update their type
+    const email = z.string().email().parse(customerEmail);
+    const newInfo = UpdateCustomerSchema.parse(newCustoemrInfo);
+
+    // update the remaining details
+    const result = this.connection
+      .prepare(
+        `UPDATE customer
+          SET email = IFNULL(@newEmail, email),
+              name = IFNULL(@name, name),
+              type = IFNULL(@type, type),
+              discountRate = IFNULL(@discountRate, discountRate),
+              threshold = IFNULL(@threshold, threshold)
+          WHERE LOWER(email) = LOWER(@email);`
+      )
+      .run({ email, ...newInfo });
+
+    if (result.changes === 0) {
+      throw Error("Customer not found! Abort operation!");
+    }
+
+    if (newInfo.type === "Flat" && newInfo.discountRate) {
+      // update discountRate for all flat reward customers
+      this.updateDiscountRate(newInfo.discountRate);
+    } else if (newInfo.type === "Step" && newInfo.threshold) {
+      // update threshold for all step reward customers
+      this.updateThreshold(newInfo.threshold);
+    }
+
+    return this.getCustomerByEmail(email);
+  };
+
+  updateDiscountRate = (newDiscountRate: number) => {
+    this.connection
+      .prepare(
+        "UPDATE customer SET discountRate = ? WHERE LOWER(type) = 'flat'"
+      )
+      .run(z.number().gt(0).lte(1).parse(newDiscountRate));
+  };
+
+  updateThreshold = (newThreshold: number) => {
+    this.connection
+      .prepare("UPDATE customer SET threshold = ? WHERE LOWER(type) = 'step'")
+      .run(z.number().positive().parse(newThreshold));
   };
 
   deleteCustomer = (email: string) => {
@@ -453,7 +500,6 @@ export class DB {
   // ==> Booking Queries
   // ==============================================
   calculateRequestedTickets = (tickets: RequestedTicket[]) => {
-    // TODO: get quantiaty of GroupTicket components
     return Object.entries(tickets).reduce(
       (total, pair) => total + pair[1].qty,
       0
