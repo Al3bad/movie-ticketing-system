@@ -39,6 +39,7 @@ export const NormalCustomerSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   type: z.literal("Normal"),
+  discountRate: z.literal(0).nullable().default(0),
 });
 
 export const FlatCustomerSchema = NormalCustomerSchema.extend({
@@ -56,9 +57,6 @@ export const StepCustomerSchema = FlatCustomerSchema.extend({
 // ==============================================
 
 export const NewBookingSchema = z.object({
-  // email: z.string().email(),
-  // name: z.string(),
-  // type: z.enum(["Normal", "Flat", "Step"]),
   customer: z.union([
     NormalCustomerSchema,
     FlatCustomerSchema,

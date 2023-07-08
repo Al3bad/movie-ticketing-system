@@ -166,7 +166,7 @@ export class DB {
         name: customers[0].name,
         email: customers[0].email,
         type: customers[0].type,
-        discountRate: customers[0].discountRate,
+        discountRate: customers[0].discountRate || 0,
         threshold: customers[0].threshold,
       },
       title: movies.find((mv) => mv.seatAvailable > 5)?.title || "Test",
@@ -174,7 +174,7 @@ export class DB {
         { type: "adult", qty: 1 },
         { type: "child", qty: 2 },
       ],
-    });
+    } as NewBooking);
   };
 
   createRandomCustomer = (
@@ -470,8 +470,15 @@ export class DB {
       const booking: { id?: number | bigint } = {};
       // Insert into booking table
       booking.id = this.connection
-        .prepare("INSERT INTO booking(customerEmail, movieTitle) VALUES (?, ?)")
-        .run(customer.email, title).lastInsertRowid;
+        .prepare(
+          "INSERT INTO booking(customerEmail, movieTitle, discountRate, threshold) VALUES (?,?,?,?)"
+        )
+        .run(
+          customer.email,
+          title,
+          (customer as StepCustomer)?.discountRate,
+          (customer as StepCustomer)?.threshold || null
+        ).lastInsertRowid;
       // Update movies
       this.updateSeats({
         title: title,
@@ -508,7 +515,7 @@ export class DB {
       return this.connection
         .prepare(
           `SELECT b.id, c.*,
-                b.movieTitle AS title,
+                b.movieTitle AS title, b.discountRate, b.threshold,
                 pt.ticketType, pt.ticketprice, pt.qty,
                 tc.component, tc.qty AS componentTicketQty
           FROM booking b
@@ -534,7 +541,7 @@ export class DB {
       return this.connection
         .prepare(
           `SELECT b.id, c.*,
-                b.movieTitle AS title,
+                b.movieTitle AS title, b.discountRate, b.threshold,
                 pt.ticketType, pt.ticketprice, pt.qty,
                 tc.component, tc.qty AS componentTicketQty
           FROM booking b

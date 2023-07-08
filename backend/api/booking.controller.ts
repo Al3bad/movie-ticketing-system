@@ -13,7 +13,8 @@ export const createBooking = (req: Request, res: Response) => {
   if (result.success) {
     try {
       // call function to insert data in db
-      const booking = db.insertBooking(result.data);
+      // FIXME: handle typing
+      const booking = db.insertBooking(result.data as NewBooking);
       return res.status(httpStatus.CREATED).json(formatBooking(booking as any));
     } catch (err: any) {
       return res

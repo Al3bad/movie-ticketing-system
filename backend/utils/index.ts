@@ -64,7 +64,7 @@ export const formatBooking = (
     email: string;
     name: string;
     type: CustomerType;
-    discountRate?: number | null;
+    discountRate: number;
     threshold?: number | null;
     title: string;
     ticketType: string;
@@ -90,13 +90,11 @@ export const formatBooking = (
       email: email,
       name: name,
       type: type,
+      discountRate: discountRate,
     },
     title: title,
     tickets: [],
   };
-  if (discountRate !== null && type !== "Normal") {
-    formattedBooking.customer.discountRate = discountRate;
-  }
   if (threshold !== null && type === "Step") {
     formattedBooking.customer.threshold = threshold;
   }

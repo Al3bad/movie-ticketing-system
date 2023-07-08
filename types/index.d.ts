@@ -77,6 +77,7 @@ type NormalCustomer = {
   name: string;
   email: string;
   type: "Normal";
+  discountRate?: 0 | null;
 };
 
 type FlatCustomer = Modify<
@@ -106,6 +107,8 @@ type NewBooking = {
   customer: Customer;
   title: string;
   tickets: RequestedTicket[];
+  discountRate: number;
+  threshold?: number | null;
 };
 
 type Booking = NewBooking & {

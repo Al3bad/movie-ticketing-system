@@ -28,6 +28,7 @@ describe("/api/booking", () => {
             email: "Cayla68@test.dev",
             name: "Robin Rowe",
             type: "Normal",
+            discountRate: 0,
           },
           title: "Avatar",
           tickets: [

@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS booking (
     id INTEGER PRIMARY KEY,
     customerEmail TEXT NOT NULL,
     movieTitle TEXT NOT NULL,
+    discountRate REAL NOT NULL,
+    threshold REAL,
     -- FKs
     FOREIGN KEY (customerEmail) REFERENCES customer(email)
         ON UPDATE NO ACTION
