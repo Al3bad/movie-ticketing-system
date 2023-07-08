@@ -7,75 +7,97 @@ const post_header = {
   },
 };
 
+// create custom ResponseError
+class ResponseError extends Error {
+  constructor(message: string, res: Response) {
+    super(message);
+    this.response = res;
+  }
+}
+
+// Create a wrapper to handle errors for all http requests
+const httpFetch = async (...options) => {
+  try {
+    const res = await fetch(...options);
+    if (!res.ok) {
+      throw new ResponseError("Fail to load data", res);
+    }
+    return res;
+  } catch (err) {
+    switch (err.response.status) {
+      case 400:
+        console.log("Bad Request");
+        break;
+      case 401:
+        console.log("Unauthorized");
+        break;
+      case 404:
+        console.log("Page Not Found");
+        break;
+      case 500:
+        console.log("Internal Server Error");
+        break;
+      default:
+        console.log(err);
+    }
+  }
+};
+
 export const fetchCustomerByEmail = async (email: string) => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/${email}`;
-  try {
-    const response = await fetch(customer_endpoint);
+  const response = await httpFetch(customer_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const fetchCustomers = async () => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/`;
-  try {
-    const response = await fetch(customer_endpoint);
+  const response = await httpFetch(customer_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const fetchMovies = async () => {
   const movies_endpoint = `${BASE_API_ENDPOINT}/movie/`;
-  try {
-    const response = await fetch(movies_endpoint);
+  const response = await httpFetch(movies_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const fetchTickets = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/ticket/`;
-  try {
-    const response = await fetch(tickets_endpoint);
+  const response = await fetch(tickets_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const fetchBookings = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/booking/`;
-  try {
-    const response = await fetch(tickets_endpoint);
+  const response = await fetch(tickets_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const fetchBookingById = async (id: number) => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/booking/${id}`;
-  try {
-    const response = await fetch(tickets_endpoint);
+  const response = await fetch(tickets_endpoint);
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
 
 export const submitBooking = async (data) => {
   const purchase_ticket_endpoint = `${BASE_API_ENDPOINT}/booking`;
-  try {
-    const response = await fetch(purchase_ticket_endpoint, {
-      ...post_header,
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(purchase_ticket_endpoint, {
+    ...post_header,
+    body: JSON.stringify(data),
+  });
+  if (response) {
     return response.json();
-  } catch (error) {
-    return error;
   }
 };
