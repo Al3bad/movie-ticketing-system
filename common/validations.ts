@@ -52,6 +52,12 @@ export const StepCustomerSchema = FlatCustomerSchema.extend({
   threshold: z.number().positive(),
 });
 
+export const NewCustomerSchema = z.union([
+  NormalCustomerSchema,
+  FlatCustomerSchema,
+  StepCustomerSchema,
+]);
+
 // ==============================================
 // --> Booking schemas
 // ==============================================

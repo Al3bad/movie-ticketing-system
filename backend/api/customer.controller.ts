@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as z from "zod";
 import db from "backend/db/db";
 import { httpStatus } from "server";
+import { NewCustomerSchema } from "@/common/validations";
 
 export const getCustomers = (req: Request, res: Response) => {
   const { page, limit } = req.query;
@@ -44,5 +45,18 @@ export const getCustomerByEmail = (req: Request, res: Response) => {
           : httpStatus.INTERNAL_SERVER_ERROR
       )
       .json({ error: { msg: err.error?.msg } });
+  }
+};
+
+export const createCustomer = (req: Request, res: Response) => {
+  try {
+    const body = NewCustomerSchema.parse(req.body);
+    const result = db.insertCustomer(body);
+    return res.status(httpStatus.CREATED).json(result);
+  } catch (err: unknown) {
+    console.log(err);
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something wrong happends!" } });
   }
 };

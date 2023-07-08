@@ -33,6 +33,44 @@ const routes: Backend.Route[] = [
     ],
     controller: controller.getCustomerByEmail,
   },
+  {
+    method: "post",
+    endpoint: "/",
+    description: "Create new customers",
+    json: [
+      {
+        name: "email",
+        type: "string",
+        description: "email of the customer",
+        required: true,
+      },
+      {
+        name: "name",
+        type: "string",
+        description: "name of the customer",
+        required: true,
+      },
+      {
+        name: "type",
+        type: "string",
+        description: "type of the customer",
+        required: true,
+      },
+      {
+        name: "discountRate",
+        type: "number",
+        description:
+          "discount rate for flat/step reward customer (required when type = Normal | Step)",
+      },
+      {
+        name: "threshold",
+        type: "number",
+        description:
+          "threshold for step reward customers (required when type = Step)",
+      },
+    ],
+    controller: controller.createCustomer,
+  },
 ];
 
 export default initRouter("/api/customer", routes);
