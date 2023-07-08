@@ -8,7 +8,7 @@ import Input from "../../UI/Input/Input";
 import Message from "../../UI/Message/Message";
 import Icon from "../../UI/Icon/Icon";
 import {
-  fetchCustomer,
+  fetchCustomerByEmail,
   fetchMovies,
   fetchTickets,
   submitBooking,
@@ -16,13 +16,13 @@ import {
 import { NewBookingSchema } from "../../../../common/validations";
 
 type Data = {
-  "movies": NewMovie[];
-  "ticketTypes": NewTicket[];
+  movies: Movie[];
+  ticketTypes: NewTicket[];
   "customer-name": string;
   "customer-type": string;
   "customer-email-input": string;
-  "movie": string;
-  "selectedTickets": Ticket[];
+  movie: string;
+  selectedTickets: Ticket[];
 };
 
 type Msg = {
@@ -41,13 +41,13 @@ const PurchaseTickets = () => {
   //----
 
   const initialData = {
-    "movies": [],
-    "ticketTypes": [],
+    movies: [],
+    ticketTypes: [],
     "customer-name": "",
     "customer-type": "",
     "customer-email-input": "",
-    "movie": "",
-    "selectedTickets": [{ type: "", qty: 0 }],
+    movie: "",
+    selectedTickets: [{ type: "", qty: 0 }],
   };
 
   const [data, setData] = useState<Data>(initialData);
@@ -59,7 +59,8 @@ const PurchaseTickets = () => {
     // Fetch Movies on Page Load
     fetchMovies()
       .then((movies) => {
-        const movieOptions = movies.map((movie: NewMovie) => {
+        console.log("movies", movies);
+        const movieOptions = movies.map((movie: Movie) => {
           return { ...movies, id: movie.title, value: movie.title };
         });
         setData((currentData) => {
@@ -74,6 +75,7 @@ const PurchaseTickets = () => {
     // Fetch Ticket Types on Page Load
     fetchTickets()
       .then((tickets) => {
+        console.log("tickets", tickets);
         const ticketOptions = tickets.map((ticket: NewTicket) => {
           return {
             ...ticket,
@@ -96,7 +98,7 @@ const PurchaseTickets = () => {
     // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
     if (data["customer-email-input"]) {
-      fetchCustomer(data["customer-email-input"])
+      fetchCustomerByEmail(data["customer-email-input"])
         .then((customer) => {
           // TO DO: transform data based on reponse from Backend before setCustomer
           setData((currentVals) => {
