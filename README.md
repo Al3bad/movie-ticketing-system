@@ -24,7 +24,7 @@
 |   ✅   | GET /api/customer/\<email\>    | Get customer by email                |
 |   ✅   | PUT /api/customer/\<email\>    | Edit customer info                   |
 |   ✅   | PUT /api/customer/             | Update all reward flat/step customer |
-|        | DELETE /api/customer/\<email\> | Delete customer                      |
+|   ✅   | DELETE /api/customer/\<email\> | Delete customer                      |
 |   ✅   | GET /api/movie/                | Get all movies                       |
 |        | GET /api/movie/\<id\>          | Get movie by id                      |
 |        | PUT /api/movie/\<id\>          | Edit moive info                      |

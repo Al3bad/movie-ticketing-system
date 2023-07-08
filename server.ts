@@ -8,6 +8,7 @@ export const httpStatus = {
   // 2xx
   OK: constants.HTTP_STATUS_OK,
   CREATED: constants.HTTP_STATUS_CREATED,
+  NO_CONTENT: constants.HTTP_STATUS_NO_CONTENT,
   // 4xx
   NOT_FOUND: constants.HTTP_STATUS_NOT_FOUND,
   BAD_REQUEST: constants.HTTP_STATUS_BAD_REQUEST,

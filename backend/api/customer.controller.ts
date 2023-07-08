@@ -96,3 +96,16 @@ export const updateCustomers = (req: Request, res: Response) => {
       .json({ error: { msg: "Something wrong happends!" } });
   }
 };
+
+export const deleteCustomer = (req: Request, res: Response) => {
+  try {
+    const email = z.string().email().parse(req.params.email);
+    db.deleteCustomer(email);
+    return res.status(httpStatus.NO_CONTENT).end();
+  } catch (err: unknown) {
+    console.log(err);
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something wrong happends!" } });
+  }
+};

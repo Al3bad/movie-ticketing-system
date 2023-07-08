@@ -492,8 +492,12 @@ export class DB {
   };
 
   deleteCustomer = (email: string) => {
-    // TODO:
-    return email;
+    const info = this.connection
+      .prepare("DELETE FROM customer WHERE LOWER(email) = LOWER(?)")
+      .run(z.string().email().parse(email));
+    if (info.changes === 0) {
+      throw new Error("Customer not found!");
+    }
   };
 
   // ==============================================

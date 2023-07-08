@@ -136,6 +136,20 @@ const routes: Backend.Route[] = [
     ],
     controller: controller.updateCustomers,
   },
+  {
+    method: "delete",
+    endpoint: "/:email",
+    description: "Delete existing customer",
+    parameters: [
+      {
+        name: "email",
+        type: "string",
+        description: "email of the customer",
+        required: true,
+      },
+    ],
+    controller: controller.deleteCustomer,
+  },
 ];
 
 export default initRouter("/api/customer", routes);
