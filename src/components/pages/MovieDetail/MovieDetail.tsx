@@ -1,5 +1,6 @@
+import Layout from "../../UI/Layout/Layout";
 const MovieDetail = () => {
-  return <div>Movie Detail</div>;
+  return <Layout title="Movie Detail"></Layout>;
 };
 
 export default MovieDetail;
