@@ -10,3 +10,8 @@
 .table__content {
   background-color: #f9fafc;
 }
+
+.table__header th,
+.table__content td {
+  padding: 5px;
+}
