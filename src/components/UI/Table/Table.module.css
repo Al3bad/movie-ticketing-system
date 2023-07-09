@@ -1,0 +1,12 @@
+.table {
+  width: 100%;
+  text-align: center;
+}
+
+.table__header {
+  background-color: #c8d3e0;
+}
+
+.table__content {
+  background-color: #f9fafc;
+}
