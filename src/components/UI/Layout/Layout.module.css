@@ -6,13 +6,19 @@
   text-align: center;
   margin: 10px 0;
 }
-.container__content {
+.container__content,
+.container__navbar {
   width: 100%;
   padding: 0% 1%;
 }
 
+.container__navbar {
+  background-color: var(--gray-800);
+}
+
 @media (min-width: 760px) {
-  .container__content {
+  .container__content,
+  .container__navbar {
     padding: 0% 10%;
   }
 }
