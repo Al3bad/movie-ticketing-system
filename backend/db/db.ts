@@ -246,20 +246,20 @@ export class DB {
     }
   };
 
-  getMoiveByTitle = (
+  getMovieByTitle = (
     title: string,
     opt: {
       onlyReleased?: boolean;
       includeIsReleased?: boolean;
     }
   ) => {
-    type EMovie = Omit<Movie, "isReleased">;
+    type EMovie = Omit<Movie, "isReleased"> & { isReleased?: boolean };
     try {
       return this.connection
         .prepare(
           `SELECT title, seatAvailable ${
             opt.includeIsReleased ? ", isReleased" : ""
-          } FROM movie WHERE title = ? AND isReleased = ?`
+          } FROM movie WHERE LOWER(title) = LOWER(?) AND isReleased = ?`
         )
         .get(title, opt.onlyReleased ? 1 : 0) as Movie | EMovie;
     } catch (err: unknown) {

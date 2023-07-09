@@ -122,8 +122,9 @@ type Booking = NewBooking & {
 declare namespace Backend {
   type ReqData = {
     name: string;
-    type: "string" | "integer" | "number";
+    type: "string" | "integer" | "number" | "boolean";
     description: string;
+    default?: string | number | boolean;
     required?: boolean;
   };
   type Route = {
