@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { httpStatus } from "server";
+import { createTypeAlias, printNode, zodToTs } from "zod-to-ts";
 
 export const initRouter = (base: string, routes: Backend.Route[]) => {
   const re = new RegExp("^/\\S+(?<!/)$");
@@ -137,4 +138,21 @@ export const formatBooking = (
   formattedBooking.tickets.push(...singleTickets, ...groupTickets);
 
   return formattedBooking;
+};
+
+// ==============================================
+// ==> Zod -> TS
+// ==============================================
+
+export const genTsFromZod = (zodSchemas: any) => {
+  for (const key in zodSchemas) {
+    const schema = zodSchemas[key];
+    // console.log(`zodToTs(${zodSchemas[key]}, ${key.slice(0, -6)})`);
+    const identifier = key.slice(0, -6);
+    const { node } = zodToTs(schema, identifier);
+    const typeAlias = createTypeAlias(node, identifier);
+    // TODO: Replace below with write to file logic
+    console.log(identifier);
+    console.log(printNode(typeAlias));
+  }
 };

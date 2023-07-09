@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { constants } from "node:http2";
 import express from "express";
-import { cors } from "./backend/middlewares";
+import { cors } from "./backend/lib/middlewares";
 import api from "./backend/api";
 
 export const httpStatus = {

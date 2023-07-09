@@ -1,4 +1,4 @@
-import { initRouter } from "backend/utils";
+import { initRouter } from "backend/lib/utils";
 import * as controller from "./ticket.controller";
 
 // ==============================================

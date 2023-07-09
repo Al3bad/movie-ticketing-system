@@ -1,5 +1,19 @@
-import { UpdateCustomerSchema } from "@/common/validations";
+import {
+  NewCustomerSchema,
+  NewMovieSchema,
+  NewTicketComponent,
+  NewTicketSchema,
+  // TicketSchema,
+  UpdateCustomerSchema,
+  PaginationOptsSchema,
+  NewBookingSchema,
+  GetMovieOptionsSchema,
+} from "@/common/validations";
 import { faker } from "@faker-js/faker";
+import {
+  InvalidTicketComponentError,
+  SeatsRangeError,
+} from "backend/lib/exceptions";
 import SQLite3, { Database, SqliteError } from "better-sqlite3";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -65,7 +79,8 @@ export class DB {
           this.connection.prepare("DROP TABLE IF EXISTS " + table.name).run();
       });
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      console.error("[ERROR] Couldn't drop tables!");
+      process.exit(1);
     }
   };
 
@@ -74,6 +89,7 @@ export class DB {
     try {
       await fs.rm(this.dbDir);
     } catch (err: unknown) {
+      console.error("[ERROR] Couldn't delete DB file!");
       process.exit(1);
     }
   };
@@ -83,7 +99,7 @@ export class DB {
       this.dropAll();
       this.connection = new SQLite3(this.dbDir);
     } catch (err: unknown) {
-      console.log("Couldn't reset DB!");
+      console.log("[ERROR] Couldn't reset DB!");
       process.exit(1);
     }
   };
@@ -176,7 +192,7 @@ export class DB {
         { type: "adult", qty: 1 },
         { type: "child", qty: 2 },
       ],
-    } as NewBooking);
+    } as z.infer<typeof NewBookingSchema>);
   };
 
   createRandomCustomer = (
@@ -215,16 +231,28 @@ export class DB {
   // ==> Movie Queries
   // ==============================================
   insertMovie = (newMovie: Movie) => {
-    const { title, seatAvailable, isReleased } = newMovie;
-
     try {
+      const { title, seatAvailable, isReleased } =
+        NewMovieSchema.parse(newMovie);
       const stmt = this.connection.prepare(
         "INSERT INTO movie(title, seatAvailable, isReleased) VALUES (?,?,?)"
       );
       stmt.run(title, seatAvailable, isReleased ? 1 : 0);
       return newMovie;
     } catch (err: unknown) {
-      return { error: this.dbErrorHandler(err) };
+      if (
+        err instanceof SqliteError &&
+        err.code === "SQLITE_CONSTRAINT_CHECK"
+      ) {
+        throw new SeatsRangeError("Invalid data", [
+          {
+            path: ["seatAvailable"],
+            message: "seatAvailable must be a positive number",
+          },
+        ]);
+      } else {
+        throw err;
+      }
     }
   };
 
@@ -232,18 +260,15 @@ export class DB {
     onlyReleased?: boolean;
     includeIsReleased?: boolean;
   }) => {
-    type EMovie = Omit<Movie, "isReleased">;
-    try {
-      return this.connection
-        .prepare(
-          `SELECT title, seatAvailable ${
-            opt.includeIsReleased ? ", isReleased" : ""
-          } FROM movie WHERE isReleased = ?`
-        )
-        .all(opt.onlyReleased ? 1 : 0) as Array<Movie | EMovie>;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    const { onlyReleased, includeIsReleased } =
+      GetMovieOptionsSchema.parse(opt);
+    return this.connection
+      .prepare(
+        `SELECT title, seatAvailable ${
+          includeIsReleased ? ", isReleased" : ""
+        } FROM movie WHERE isReleased = ?`
+      )
+      .all(onlyReleased ? 1 : 0);
   };
 
   getMovieByTitle = (
@@ -253,21 +278,24 @@ export class DB {
       includeIsReleased?: boolean;
     }
   ) => {
-    type EMovie = Omit<Movie, "isReleased"> & { isReleased?: boolean };
-    try {
-      return this.connection
-        .prepare(
-          `SELECT title, seatAvailable ${
-            opt.includeIsReleased ? ", isReleased" : ""
-          } FROM movie WHERE LOWER(title) = LOWER(?) AND isReleased = ?`
-        )
-        .get(title, opt.onlyReleased ? 1 : 0) as Movie | EMovie;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    const { onlyReleased, includeIsReleased } =
+      GetMovieOptionsSchema.parse(opt);
+    return this.connection
+      .prepare(
+        `SELECT title, seatAvailable ${
+          includeIsReleased ? ", isReleased" : ""
+        } FROM movie WHERE LOWER(title) = LOWER(?) AND isReleased = ?`
+      )
+      .get(z.string().nonempty().parse(title), onlyReleased ? 1 : 0) as Movie;
   };
 
-  updateSeats = ({ title, qty }: RequestedSeats) => {
+  updateSeats = (requestedSeats: RequestedSeats) => {
+    const { title, qty } = z
+      .object({
+        title: z.string().nonempty(),
+        qty: z.number().int().positive(),
+      })
+      .parse(requestedSeats);
     try {
       return this.connection
         .prepare(
@@ -275,7 +303,20 @@ export class DB {
         )
         .run(title, qty, title);
     } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
+      if (
+        err instanceof SqliteError &&
+        err.code === "SQLITE_CONSTRAINT_CHECK"
+      ) {
+        const movie = this.getMovieByTitle(title, { onlyReleased: false });
+        throw new SeatsRangeError("Invalid data", [
+          {
+            path: ["qty"],
+            message: `Requested ${qty} tickets but only ${movie.seatAvailable} seats are available!`,
+          },
+        ]);
+      } else {
+        throw err;
+      }
     }
   };
 
@@ -285,13 +326,27 @@ export class DB {
     isReleased = null,
   }: UpdateMovie) => {
     try {
-      return this.connection
+      const info = this.connection
         .prepare(
           "UPDATE movie SET title = IFNULL(?, title), seatAvailable = IFNULL(?, seatAvailable), isReleased = IFNULL(?, isReleased)"
         )
         .run(title, seatAvailable, isReleased);
+      if (info.changes === 0) return undefined;
+      else return info;
     } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
+      if (
+        err instanceof SqliteError &&
+        err.code === "SQLITE_CONSTRAINT_CHECK"
+      ) {
+        throw new SeatsRangeError("Invalid data", [
+          {
+            path: ["seatAvailable"],
+            message: "seatAvailable must be a positive number",
+          },
+        ]);
+      } else {
+        throw err;
+      }
     }
   };
 
@@ -304,38 +359,32 @@ export class DB {
   // ==> Ticket Queries
   // ==============================================
   insertTicket = (newTicket: NewTicket) => {
-    const { type, price = null } = newTicket;
-
-    try {
-      const stmt = this.connection.prepare(
-        "INSERT INTO ticket(type, price) VALUES (?,?)"
-      );
-      stmt.run(type, price);
-      return newTicket;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    const { type, price } = NewTicketSchema.parse(newTicket);
+    const stmt = this.connection.prepare(
+      "INSERT INTO ticket(type, price) VALUES (?,?)"
+    );
+    stmt.run(type, price);
+    return newTicket;
   };
 
   insertTicketComponent = (newTicketComponent: NewTicketComponent) => {
-    const { type, component, qty } = newTicketComponent;
+    const parsed = NewTicketComponent.parse(newTicketComponent);
 
-    try {
-      const stmt = this.connection.prepare(
-        "INSERT INTO ticketComponent(type, component, qty) VALUES (?,?,?)"
-      );
-      stmt.run(type, component, qty);
-      return newTicketComponent;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    if (parsed.type === parsed.component)
+      throw new InvalidTicketComponentError("Invalid data");
+
+    this.connection
+      .prepare(
+        "INSERT INTO ticketComponent (type, component, qty) VALUES (@type,@component,@qty)"
+      )
+      .run(parsed);
+    return parsed;
   };
 
   getAllTickets = () => {
     const groupTicketDiscount = 0.8;
-    try {
-      const stmt = this.connection.prepare(
-        `SELECT  ticket.type,
+    const stmt = this.connection.prepare(
+      `SELECT  ticket.type,
         IFNULL(ticket.price, SUM(groupTicket.price) * ?)
             AS "price",
         IFNULL(SUM(tc.qty), 1)
@@ -347,12 +396,8 @@ export class DB {
             ON tc.component = groupTicket.type
         GROUP BY ticket.type
         HAVING ticket.price IS NOT NULL OR groupTicket.price IS NOT NULL`
-      );
-      const data = stmt.all(groupTicketDiscount) as Ticket[];
-      return data;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    );
+    return stmt.all(groupTicketDiscount) as Ticket[];
   };
 
   updateTicket = (ticket: UpdateTicket) => {
@@ -374,30 +419,13 @@ export class DB {
   // ==> Customer Queries
   // ==============================================
   insertCustomer = (newCustomer: Customer) => {
-    const { email, name, type } = newCustomer;
-
-    let discountRate = null;
-    let threshold = null;
-    if (newCustomer.type === "Step") {
-      if (!newCustomer.threshold)
-        throw Error("Threshold value is missing for reward step customer!");
-      threshold = newCustomer.threshold;
-    }
-    if (newCustomer.type !== "Normal") {
-      if (!newCustomer.discountRate) {
-        throw Error(
-          "Discount rate value is missing for reward flat/step customer!"
-        );
-      }
-      discountRate = newCustomer.discountRate;
-    }
-
+    const parsed = NewCustomerSchema.parse(newCustomer);
     try {
       const stmt = this.connection.prepare(
-        "INSERT INTO customer(email, name, type, discountRate, threshold) VALUES (?,?,?,?,?)"
+        "INSERT INTO customer(email, name, type, discountRate, threshold) VALUES (@email, @name, @type, @discountRate, @threshold)"
       );
-      stmt.run(email, name, type, discountRate, threshold);
-      return newCustomer;
+      stmt.run(parsed);
+      return parsed;
     } catch (err: unknown) {
       const customerExists =
         this.connection.inTransaction &&
@@ -406,25 +434,18 @@ export class DB {
       if (customerExists) {
         return;
       }
-      throw { error: this.dbErrorHandler(err) };
+      throw err;
     }
   };
 
-  getCustomers = ({
-    page,
-    limit,
-  }: {
-    page?: number;
-    limit?: number;
-  }): Customer[] => {
-    try {
-      let stmt = "SELECT * FROM customer";
-      if (typeof limit === "number") stmt += " LIMIT @limit";
-      if (typeof page === "number") stmt += " OFFSET @page";
-      return this.connection.prepare(stmt).all({ page, limit }) as Customer[];
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+  getCustomers = (
+    paginationOpts: z.infer<typeof PaginationOptsSchema>
+  ): Customer[] => {
+    const parsed = PaginationOptsSchema.parse(paginationOpts);
+    let stmt = "SELECT * FROM customer";
+    if (typeof parsed.limit === "number") stmt += " LIMIT @limit";
+    if (typeof parsed.page === "number") stmt += " OFFSET @page";
+    return this.connection.prepare(stmt).all(parsed) as Customer[];
   };
 
   getAllCustomers = (): Customer[] => {
@@ -432,13 +453,9 @@ export class DB {
   };
 
   getCustomerByEmail = (email: string) => {
-    try {
-      return this.connection
-        .prepare("SELECT * FROM customer WHERE LOWER(email) = LOWER(?)")
-        .get(email) as Customer;
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+    return this.connection
+      .prepare("SELECT * FROM customer WHERE LOWER(email) = LOWER(?)")
+      .get(z.string().email().parse(email)) as Customer;
   };
 
   updateCustomer = (
@@ -450,7 +467,7 @@ export class DB {
     const newInfo = UpdateCustomerSchema.parse(newCustoemrInfo);
 
     // update the remaining details
-    const result = this.connection
+    const info = this.connection
       .prepare(
         `UPDATE customer
           SET email = IFNULL(@newEmail, email),
@@ -462,8 +479,8 @@ export class DB {
       )
       .run({ email, ...newInfo });
 
-    if (result.changes === 0) {
-      throw Error("Customer not found! Abort operation!");
+    if (info.changes === 0) {
+      return undefined;
     }
 
     if (newInfo.type === "Flat" && newInfo.discountRate) {
@@ -478,7 +495,7 @@ export class DB {
   };
 
   updateDiscountRate = (newDiscountRate: number) => {
-    this.connection
+    return this.connection
       .prepare(
         "UPDATE customer SET discountRate = ? WHERE LOWER(type) = 'flat'"
       )
@@ -486,7 +503,7 @@ export class DB {
   };
 
   updateThreshold = (newThreshold: number) => {
-    this.connection
+    return this.connection
       .prepare("UPDATE customer SET threshold = ? WHERE LOWER(type) = 'step'")
       .run(z.number().positive().parse(newThreshold));
   };
@@ -496,22 +513,24 @@ export class DB {
       .prepare("DELETE FROM customer WHERE LOWER(email) = LOWER(?)")
       .run(z.string().email().parse(email));
     if (info.changes === 0) {
-      throw new Error("Customer not found!");
+      return undefined;
     }
+    return info;
   };
 
   // ==============================================
   // ==> Booking Queries
   // ==============================================
   calculateRequestedTickets = (tickets: RequestedTicket[]) => {
+    // FIXME: update calculate requested tickets correclty (components in group tickets)
     return Object.entries(tickets).reduce(
       (total, pair) => total + pair[1].qty,
       0
     );
   };
 
-  insertBooking = (newBooking: NewBooking) => {
-    const { customer, title, tickets } = newBooking;
+  insertBooking = (newBooking: z.infer<typeof NewBookingSchema>) => {
+    const { customer, title, tickets } = NewBookingSchema.parse(newBooking);
     try {
       // Start a inTransaction
       this.connection.prepare("BEGIN").run();
@@ -526,8 +545,8 @@ export class DB {
         .run(
           customer.email,
           title,
-          (customer as StepCustomer)?.discountRate,
-          (customer as StepCustomer)?.threshold || null
+          customer.discountRate,
+          customer.threshold
         ).lastInsertRowid;
       // Update movies
       this.updateSeats({
@@ -556,15 +575,14 @@ export class DB {
       return result;
     } catch (err: unknown) {
       this.connection.prepare("ROLLBACK").run();
-      throw { error: this.dbErrorHandler(err) };
+      throw err;
     }
   };
 
   getAllBooking = () => {
-    try {
-      return this.connection
-        .prepare(
-          `SELECT b.id, c.*,
+    return this.connection
+      .prepare(
+        `SELECT b.id, c.*,
                 b.movieTitle AS title, b.discountRate, b.threshold,
                 pt.ticketType, pt.ticketprice, pt.qty,
                 tc.component, tc.qty AS componentTicketQty
@@ -579,18 +597,14 @@ export class DB {
           -- Get price of single tickets
           LEFT JOIN ticket singleTicket
               on pt.ticketType = singleTicket.type`
-        )
-        .all();
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
+      )
+      .all();
   };
 
   getBookingById = (id: number | bigint) => {
-    try {
-      return this.connection
-        .prepare(
-          `SELECT b.id, c.*,
+    return this.connection
+      .prepare(
+        `SELECT b.id, c.*,
                 b.movieTitle AS title, b.discountRate, b.threshold,
                 pt.ticketType, pt.ticketprice, pt.qty,
                 tc.component, tc.qty AS componentTicketQty
@@ -606,50 +620,8 @@ export class DB {
           LEFT JOIN ticket singleTicket
               on pt.ticketType = singleTicket.type
           WHERE b.id = ?`
-        )
-        .all(id);
-    } catch (err: unknown) {
-      throw { error: this.dbErrorHandler(err) };
-    }
-  };
-
-  // ==============================================
-  // ==> Error Handling
-  // ==============================================
-  dbErrorHandler = (err: unknown) => {
-    if (err instanceof SqliteError) {
-      if (err.code === "SQLITE_CONSTRAINT_PRIMARYKEY") {
-        return {
-          type: "DB",
-          msg: err.message,
-        };
-      } else if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-        return {
-          type: "DB",
-          msg: err.message,
-        };
-      } else if (err.code === "SQLITE_CONSTRAINT_CHECK") {
-        return {
-          type: "DB",
-          msg: "The number of requested seats exceeds the seats available!",
-        };
-      } else {
-        return {
-          type: "DB_" + err.code,
-          msg: err.message,
-        };
-      }
-    } else {
-      console.log(
-        `[ERROR] ${
-          (err as Error).message
-        }.\n\nOccured in filename: ${__filename}`
-      );
-      return {
-        type: "UNKNOWN",
-        msg: "Server error. Please contact the developer!",
-      };
-    }
+      )
+      .all(z.number().positive().int().or(z.bigint()).parse(id));
   };
 }
 

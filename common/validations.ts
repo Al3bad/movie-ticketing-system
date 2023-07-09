@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+export const PaginationOptsSchema = z.object({
+  page: z.coerce.number().positive().int().optional(),
+  limit: z.coerce.number().positive().int().optional(),
+});
+
+export const GetMovieOptionsSchema = z.object({
+  onlyReleased: z.boolean().optional().default(true),
+  includeIsReleased: z.boolean().optional().default(false),
+});
+
 // ==============================================
 // --> Movie schemas
 // ==============================================
@@ -19,7 +29,8 @@ export const MovieSchema = NewMovieSchema.extend({
 // ==============================================
 
 export const NewTicketSchema = z.object({
-  type: z.string(),
+  type: z.string().toLowerCase(),
+  price: z.number().positive().optional().nullable().default(null),
 });
 
 export const TicketSchema = NewTicketSchema.extend({
@@ -28,6 +39,12 @@ export const TicketSchema = NewTicketSchema.extend({
 
 export const GroupTicketSchema = NewTicketSchema.extend({
   components: z.array(TicketSchema),
+});
+
+export const NewTicketComponent = z.object({
+  type: z.string().toLowerCase(),
+  component: z.string().toLowerCase(),
+  qty: z.number().int().positive(),
 });
 
 // ==============================================
@@ -53,8 +70,12 @@ export const StepCustomerSchema = FlatCustomerSchema.extend({
 });
 
 export const NewCustomerSchema = z.union([
-  NormalCustomerSchema,
-  FlatCustomerSchema,
+  NormalCustomerSchema.extend({
+    threshold: z.literal(null).optional().nullable().default(null),
+  }),
+  FlatCustomerSchema.extend({
+    threshold: z.literal(null).optional().nullable().default(null),
+  }),
   StepCustomerSchema,
 ]);
 
@@ -100,8 +121,12 @@ export const UpdateCustomersSchema = z
 
 export const NewBookingSchema = z.object({
   customer: z.union([
-    NormalCustomerSchema,
-    FlatCustomerSchema,
+    NormalCustomerSchema.extend({
+      threshold: z.literal(null).optional().nullable().default(null),
+    }),
+    FlatCustomerSchema.extend({
+      threshold: z.literal(null).optional().nullable().default(null),
+    }),
     StepCustomerSchema,
   ]),
   title: z.string(),

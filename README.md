@@ -26,10 +26,10 @@
 |   ✅   | PUT /api/customer/             | Update all reward flat/step customer |
 |   ✅   | DELETE /api/customer/\<email\> | Delete customer                      |
 |   ✅   | GET /api/movie/                | Get all movies                       |
-|   ✅   | GET /api/movie/\<id\>          | Get movie by id                      |
-|        | PUT /api/movie/\<id\>          | Edit moive info                      |
-|        | DELETE /api/movie/\<id\>       | Delete moive                         |
+|   ✅   | GET /api/movie/\<title\>       | Get movie by title                   |
+|        | PUT /api/movie/\<title\>       | Edit moive info                      |
+|        | DELETE /api/movie/\<title\>    | Delete moive                         |
 |   ✅   | GET /api/ticket/               | Get all ticket types                 |
-|        | GET /api/ticket/\<id\>         | Get ticket type by id                |
-|        | PUT /api/ticket/\<id\>         | Edit ticket type info                |
-|        | DELETE /api/ticket/\<id\>      | Delete ticket type                   |
+|        | GET /api/ticket/\<type\>       | Get ticket type by type name         |
+|        | PUT /api/ticket/\<type\>       | Edit ticket type info                |
+|        | DELETE /api/ticket/\<type\>    | Delete ticket type                   |

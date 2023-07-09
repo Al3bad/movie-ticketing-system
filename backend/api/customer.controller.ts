@@ -4,108 +4,67 @@ import db from "backend/db/db";
 import { httpStatus } from "server";
 import {
   NewCustomerSchema,
+  PaginationOptsSchema,
   UpdateCustomerSchema,
   UpdateCustomersSchema,
 } from "@/common/validations";
+import { NotFoundResourceError } from "backend/lib/exceptions";
+import { RunResult } from "better-sqlite3";
 
 export const getCustomers = (req: Request, res: Response) => {
-  const { page, limit } = req.query;
-
-  const querySchema = z.object({
-    page: z.coerce.number().optional(),
-    limit: z.coerce.number().optional(),
+  const { page, limit } = PaginationOptsSchema.parse(req.query);
+  const result = db.getCustomers({
+    page: page || 1,
+    limit: limit || 20,
   });
-
-  try {
-    const q = querySchema.parse({ page, limit });
-    const result = db.getCustomers({ page: q.page || 1, limit: q.limit || 20 });
-    return res.status(httpStatus.OK).json(result);
-  } catch (err: any) {
-    return res
-      .status(
-        err.error.type === "DB" || err instanceof z.ZodError
-          ? httpStatus.BAD_REQUEST
-          : httpStatus.INTERNAL_SERVER_ERROR
-      )
-      .json({ error: { msg: err.error.msg } });
-  }
+  return res.status(httpStatus.OK).json(result);
 };
 
 export const getCustomerByEmail = (req: Request, res: Response) => {
-  const querySchema = z.string().email();
-
-  try {
-    const email = querySchema.parse(req.params.email);
-    const result = db.getCustomerByEmail(email);
-    if (!result) {
-      return res.status(httpStatus.NOT_FOUND).json({});
-    }
-    return res.status(httpStatus.OK).json(result);
-  } catch (err: any) {
-    return res
-      .status(
-        err.error?.type === "DB" || err instanceof z.ZodError
-          ? httpStatus.BAD_REQUEST
-          : httpStatus.INTERNAL_SERVER_ERROR
-      )
-      .json({ error: { msg: err.error?.msg } });
-  }
+  const email = z.string().email().parse(req.params.email);
+  const result = db.getCustomerByEmail(email);
+  if (!result)
+    throw new NotFoundResourceError(
+      `Customer with email = '${email}' is not found!`,
+      "customer"
+    );
+  return res.status(httpStatus.OK).json(result);
 };
 
 export const createCustomer = (req: Request, res: Response) => {
-  try {
-    const newCustomer = NewCustomerSchema.parse(req.body);
-    const result = db.insertCustomer(newCustomer);
-    return res.status(httpStatus.CREATED).json(result);
-  } catch (err: unknown) {
-    console.log(err);
-    return res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something wrong happends!" } });
-  }
+  const newCustomer = NewCustomerSchema.parse(req.body);
+  const result = db.insertCustomer(newCustomer);
+  return res.status(httpStatus.CREATED).json(result);
 };
 
 export const updateCustomer = (req: Request, res: Response) => {
-  try {
-    console.log(req.body, req.params);
-    const email = z.string().email().parse(req.params.email);
-    const newCustomerInfo = UpdateCustomerSchema.parse(req.body);
-    const updatedCustomer = db.updateCustomer(email, newCustomerInfo);
-    return res.status(httpStatus.OK).json(updatedCustomer);
-  } catch (err: unknown) {
-    console.log(err);
-    return res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something wrong happends!" } });
-  }
+  const email = z.string().email().parse(req.params.email);
+  const newCustomerInfo = UpdateCustomerSchema.parse(req.body);
+  const result = db.updateCustomer(email, newCustomerInfo);
+  if (!result)
+    throw new NotFoundResourceError(
+      `Customer with email = '${email}' is not found!`,
+      "customer"
+    );
+  return res.status(httpStatus.OK).json(result);
 };
 
 export const updateCustomers = (req: Request, res: Response) => {
-  try {
-    const newInfo = UpdateCustomersSchema.parse(req.body);
-    if (newInfo.type === "Flat") {
-      db.updateDiscountRate(newInfo.discountRate);
-    } else {
-      db.updateThreshold(newInfo.threshold);
-    }
-    return res.status(httpStatus.OK).json({ updated: true });
-  } catch (err: unknown) {
-    console.log(err);
-    return res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something wrong happends!" } });
-  }
+  const parsed = UpdateCustomersSchema.parse(req.body);
+  let result: RunResult;
+  if (parsed.type === "Flat")
+    result = db.updateDiscountRate(parsed.discountRate);
+  else result = db.updateThreshold(parsed.threshold);
+  return res.status(httpStatus.OK).json({ changes: result.changes });
 };
 
 export const deleteCustomer = (req: Request, res: Response) => {
-  try {
-    const email = z.string().email().parse(req.params.email);
-    db.deleteCustomer(email);
-    return res.status(httpStatus.NO_CONTENT).end();
-  } catch (err: unknown) {
-    console.log(err);
-    return res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something wrong happends!" } });
-  }
+  const email = z.string().email().parse(req.params.email);
+  const result = db.deleteCustomer(email);
+  if (!result)
+    throw new NotFoundResourceError(
+      `Customer with email = '${email}' is not found!`,
+      "customer"
+    );
+  return res.status(httpStatus.NO_CONTENT).json({ changes: result.changes });
 };

@@ -1,5 +1,5 @@
 import * as controller from "./movie.controller";
-import { initRouter } from "backend/utils";
+import { initRouter } from "backend/lib/utils";
 
 // ==============================================
 // ==> Define Routes
