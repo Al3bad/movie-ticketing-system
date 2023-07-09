@@ -1,24 +1,24 @@
 .multi-inputs {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    width: 100%;
-    margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  margin-bottom: 8px;
 }
 
 .multi-inputs__lg,
 .multi-inputs__sm {
-    margin-bottom: 0;
-    border: 2px solid var(--input-border-color);
+  margin-bottom: 0;
+  border: 2px solid var(--gray-300);
 }
 
 .multi-inputs__lg {
-    width: 80%;
-    border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
-    border-right: none;
+  width: 80%;
+  border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
+  border-right: none;
 }
 
 .multi-inputs__sm {
-    width: 20%;
-    border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
+  width: 20%;
+  border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
 }

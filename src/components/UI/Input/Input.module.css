@@ -1,41 +1,41 @@
 .input-field {
-    width: 100%;
-    margin-bottom: 8px;
+  width: 100%;
+  margin-bottom: 8px;
 }
 
 .input-field.input-field--multi-inputs-l,
 .input-field.input-field--multi-inputs-r {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .input-field.input-field--multi-inputs-l input {
-    border: none;
-    border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
+  border: none;
+  border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
 }
 
 .input-field.input-field--multi-inputs-r input {
-    border: none;
-    border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
+  border: none;
+  border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
 }
 
 .input-field label,
 .input-field input {
-    font-size: var(--font-size);
+  font-size: var(--font-size);
 }
 
 .input-field label {
-    display: block;
+  display: block;
 }
 
 .input-field input {
-    height: var(--input-height);
-    border: 2px solid var(--input-border-color);
-    padding: var(--input-padding);
-    width: 100%;
-    border-radius: var(--input-border-radius);
-    background-color: var(--default-bg-color);
+  height: var(--input-height);
+  border: 2px solid var(--gray-300);
+  padding: var(--input-padding);
+  width: 100%;
+  border-radius: var(--input-border-radius);
+  background-color: var(--secondary);
 }
 
 .input-field input:focus {
-    outline: none;
+  outline: none;
 }

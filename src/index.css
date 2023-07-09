@@ -2,15 +2,21 @@
 :root {
   --input-height: 35px;
   --input-border-radius: 5px;
-  --input-border-color: rgba(200, 211, 224, 1);
   --input-padding: 5px;
-  --text-color: rgba(30, 38, 47, 1);
   --font-size: 12px;
   --primary: rgba(52, 96, 197, 1);
+  --primary-dark: rgba(41, 82, 176, 1);
   --secondary: rgba(249, 250, 252, 1);
-  --default-bg-color: rgba(249, 250, 252, 1);
-  --error-color: red;
-  --success-color: green;
+  --red: rgba(228, 0, 0, 1);
+  --green: rgba(10, 183, 48, 1);
+  --gray-100: rgba(231, 236, 244, 1);
+  --gray-200: rgba(220, 225, 235, 1);
+  --gray-300: rgba(200, 211, 224, 1);
+  --gray-400: rgba(165, 180, 197, 1);
+  --gray-500: rgba(101, 116, 134, 1);
+  --gray-600: rgba(66, 78, 93, 1);
+  --gray-700: rgba(47, 58, 70, 1);
+  --gray-800: rgba(30, 38, 47, 1);
 }
 
 /* Global Styling */
@@ -24,7 +30,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-  color: var(--text-color);
+  color: var(--gray-800);
 }
 
 * {
