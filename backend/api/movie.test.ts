@@ -40,9 +40,27 @@ describe("/api/movie", () => {
       ]);
   });
 
-  it("GET /notFound - Returns Not Found with help body", () => {
+  it("GET /notFound - Returns Not Found movie with an error message", () => {
     cy.request({
       url: apiUrl + "/movie/notFound",
+      method: "GET",
+      failOnStatusCode: false,
+    }).should((res) => {
+      expect(res.status).to.eq(404);
+      expect(res.body).to.have.deep.eq({
+        error: {
+          msg: "Movie with title = 'notFound' is not found!",
+          details: {
+            resourceType: "movie",
+          },
+        },
+      });
+    });
+  });
+
+  it("GET /avatar/notFound - Returns Not Found with help body", () => {
+    cy.request({
+      url: apiUrl + "/movie/avatar/notFound",
       method: "GET",
       failOnStatusCode: false,
     }).should((res) => {

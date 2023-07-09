@@ -8,7 +8,7 @@ import {
   UpdateCustomerSchema,
   UpdateCustomersSchema,
 } from "@/common/validations";
-import { NotFoundResourceError } from "backend/lib/exceptions";
+import { NotFoundResourceError } from "backend/lib/errors";
 import { RunResult } from "better-sqlite3";
 
 export const getCustomers = (req: Request, res: Response) => {

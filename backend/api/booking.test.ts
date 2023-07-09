@@ -101,7 +101,15 @@ describe("/api/booking", () => {
       expect(res.status).to.eq(400);
       expect(res.body).to.deep.eq({
         error: {
-          msg: "Invalid booking ID!",
+          msg: "Invalid data",
+          details: {
+            issues: [
+              {
+                path: [],
+                msg: "Invalid input",
+              },
+            ],
+          },
         },
       });
     });
@@ -114,7 +122,14 @@ describe("/api/booking", () => {
       failOnStatusCode: false,
     }).should((res) => {
       expect(res.status).to.eq(404);
-      expect(res.body).to.deep.eq({});
+      expect(res.body).to.deep.eq({
+        error: {
+          msg: "Booking with ID = 1000 is not found!",
+          details: {
+            resourceType: "booking",
+          },
+        },
+      });
     });
   });
 

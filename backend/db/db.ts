@@ -13,7 +13,7 @@ import { faker } from "@faker-js/faker";
 import {
   InvalidTicketComponentError,
   SeatsRangeError,
-} from "backend/lib/exceptions";
+} from "backend/lib/errors";
 import SQLite3, { Database, SqliteError } from "better-sqlite3";
 import fs from "node:fs/promises";
 import path from "node:path";

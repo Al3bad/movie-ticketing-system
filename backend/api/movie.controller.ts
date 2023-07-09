@@ -3,7 +3,7 @@ import * as z from "zod";
 import db from "backend/db/db";
 import { httpStatus } from "server";
 import { GetMovieOptionsSchema } from "@/common/validations";
-import { NotFoundResourceError } from "backend/lib/exceptions";
+import { NotFoundResourceError } from "backend/lib/errors";
 
 export const getAllMovies = (req: Request, res: Response) => {
   const options = GetMovieOptionsSchema.parse(req.query);

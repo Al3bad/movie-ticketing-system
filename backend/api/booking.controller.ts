@@ -1,7 +1,7 @@
 import { NewBookingSchema } from "@/common/validations";
 // import { insertBooking } from "backend/db/dbQueries";
 import db from "backend/db/db";
-import { NotFoundResourceError } from "backend/lib/exceptions";
+import { NotFoundResourceError } from "backend/lib/errors";
 import { formatBooking, formatBookings } from "backend/lib/utils";
 import { Request, Response } from "express";
 import { httpStatus } from "server";

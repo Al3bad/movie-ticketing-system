@@ -6,7 +6,7 @@ import {
   SeatsRangeError,
   NotFoundResourceError,
   DuplicationError,
-} from "./exceptions";
+} from "./errors";
 import { httpStatus } from "server";
 
 export const cors = (_: Request, res: Response, next: NextFunction) => {
