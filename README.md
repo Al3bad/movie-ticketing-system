@@ -47,4 +47,4 @@
 
 # Server Structure
 
-[High level structure of the server](./images/server-structure.png)
+![High level structure of the server](./images/server-structure.png)
