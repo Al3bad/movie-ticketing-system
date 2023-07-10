@@ -1,7 +1,6 @@
 .navbar {
   width: 100%;
   color: var(--gray-200);
-  padding: 10px 0;
   background-color: var(--gray-800);
 }
 
@@ -21,17 +20,17 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding: 15px 0;
 }
 
 .navbar__menu {
   list-style-type: none;
   transition: ease-in-out 0.3s;
   height: 100vh;
-  margin-top: 2%;
+  border-top: 1px solid #657486;
 }
 .navbar__menu li {
   margin: 15px 10px;
-  display: flex;
 }
 
 .navbar__menu li span {
@@ -42,6 +41,7 @@
 .navbar__menu li a {
   color: var(--gray-200);
   text-decoration: none;
+  display: flex;
 }
 
 .navbar__menu li a:hover {
@@ -60,10 +60,12 @@
   justify-content: center;
   align-items: center;
 }
+
 .navbar__menu-icon:hover {
   cursor: pointer;
   color: black;
 }
+
 @media (min-width: 760px) {
   .navbar,
   .navbar__menu {
@@ -73,6 +75,10 @@
     align-items: center;
   }
 
+  .navbar__menu {
+    padding: 0;
+  }
+
   .navbar {
     padding: 5px 0;
   }
@@ -80,6 +86,7 @@
   .navbar__menu {
     height: auto;
     margin-top: 0;
+    border-top: none;
   }
 
   .navbar__menu li span {
