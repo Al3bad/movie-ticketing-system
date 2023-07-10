@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import user_profile from "../../../assets/user_profile.png";
 import Icon from "../Icon/Icon";
@@ -50,34 +51,44 @@ const NavBar: React.FC<NavBarProps> = (props) => {
   const menu = (
     <ul className={styles["navbar__menu"]}>
       <li>
-        <span>
-          <Icon name="dashboard" />
-        </span>
-        Dashboard
+        <Link to="/dashboard">
+          <span>
+            <Icon name="dashboard" />
+          </span>
+          Dashboard
+        </Link>
       </li>
       <li>
-        <span>
-          <Icon name="cart" />
-        </span>
-        Purchase Ticket
+        <Link to="/">
+          <span>
+            <Icon name="cart" />
+          </span>
+          Purchase Ticket
+        </Link>
       </li>
       <li>
-        <span>
-          <Icon name="customer" />
-        </span>
-        Customers
+        <Link to="/customer">
+          <span>
+            <Icon name="customer" />
+          </span>
+          Customers
+        </Link>
       </li>
       <li>
-        <span>
-          <Icon name="ticket" />
-        </span>
-        Tickets
+        <Link to="/ticket">
+          <span>
+            <Icon name="ticket" />
+          </span>
+          Tickets
+        </Link>
       </li>
       <li>
-        <span>
-          <Icon name="clock" />
-        </span>
-        Bookings
+        <Link to="/booking">
+          <span>
+            <Icon name="clock" />
+          </span>
+          Bookings
+        </Link>
       </li>
     </ul>
   );
