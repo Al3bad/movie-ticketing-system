@@ -4,6 +4,39 @@ import styles from "./NavBar.module.css";
 import user_profile from "../../../assets/user_profile.png";
 import Icon from "../Icon/Icon";
 
+const menuItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: "dashboard",
+  },
+  {
+    title: "Purchase Ticket",
+    url: "/purchase-ticket",
+    icon: "cart",
+  },
+  {
+    title: "Customer",
+    url: "/customer",
+    icon: "customer",
+  },
+  {
+    title: "Tickets",
+    url: "/ticket",
+    icon: "ticket",
+  },
+  {
+    title: "Movies",
+    url: "/movie",
+    icon: "movie",
+  },
+  {
+    title: "Bookings",
+    url: "/booking",
+    icon: "clock",
+  },
+];
+
 type NavBarProps = {
   active: string;
   className?: string;
@@ -51,54 +84,18 @@ const NavBar: React.FC<NavBarProps> = (props) => {
 
   const menu = (
     <ul className={styles["navbar__menu"]}>
-      <li>
-        <Link to="/dashboard">
-          <span>
-            <Icon name="dashboard" />
-          </span>
-          Dashboard
-        </Link>
-      </li>
-      <li>
-        <Link to="/">
-          <span>
-            <Icon name="cart" />
-          </span>
-          Purchase Ticket
-        </Link>
-      </li>
-      <li>
-        <Link to="/customer">
-          <span>
-            <Icon name="customer" />
-          </span>
-          Customers
-        </Link>
-      </li>
-      <li>
-        <Link to="/ticket">
-          <span>
-            <Icon name="ticket" />
-          </span>
-          Tickets
-        </Link>
-      </li>
-      <li>
-        <Link to="/movie">
-          <span>
-            <Icon name="movie" />
-          </span>
-          Movies
-        </Link>
-      </li>
-      <li>
-        <Link to="/booking">
-          <span>
-            <Icon name="clock" />
-          </span>
-          Bookings
-        </Link>
-      </li>
+      {menuItems.map((item, id) => {
+        return (
+          <li key={id}>
+            <Link to={item.url}>
+              <span>
+                <Icon name={item.icon} />
+              </span>
+              {item.title}
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 
