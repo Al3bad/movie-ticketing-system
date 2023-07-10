@@ -12,6 +12,19 @@ const routes: Backend.Route[] = [
     controller: controller.getAllTickets,
   },
   {
+    method: "get",
+    endpoint: "/:type",
+    description: "Get details of a ticket type",
+    parameters: [
+      {
+        name: "type",
+        type: "string",
+        description: "Current ticket type name (case insesitive)",
+      },
+    ],
+    controller: controller.getTicket,
+  },
+  {
     method: "post",
     endpoint: "/",
     description: "Create new ticket type",

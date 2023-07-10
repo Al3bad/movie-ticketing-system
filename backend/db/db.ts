@@ -384,23 +384,49 @@ export class DB {
     return parsed;
   };
 
-  getAllTickets = () => {
+  getTickets = (type?: string) => {
     const groupTicketDiscount = 0.8;
-    const stmt = this.connection.prepare(
-      `SELECT  ticket.type,
-        IFNULL(ticket.price, SUM(groupTicket.price) * ?)
-            AS "price",
-        IFNULL(SUM(tc.qty), 1)
-            AS "qty"
-        FROM ticket
-        LEFT JOIN ticketComponent tc
-            ON ticket.type = tc.type
-        LEFT JOIN ticket groupTicket
-            ON tc.component = groupTicket.type
-        GROUP BY ticket.type
-        HAVING ticket.price IS NOT NULL OR groupTicket.price IS NOT NULL`
-    );
-    return stmt.all(groupTicketDiscount) as Ticket[];
+    const parsed = z.string().optional().parse(type);
+    const stmt = this.connection.prepare(`SELECT  ticket.type,
+                                          IFNULL(ticket.price, SUM(groupTicket.price) * @groupTicketDiscount)
+                                              AS "price",
+                                          IFNULL(SUM(tc.qty), 1)
+                                              AS "qty"
+                                          FROM ticket
+                                          LEFT JOIN ticketComponent tc
+                                              ON ticket.type = tc.type
+                                          LEFT JOIN ticket groupTicket
+                                              ON tc.component = groupTicket.type
+                                          ${
+                                            parsed
+                                              ? "WHERE LOWER(ticket.type) = LOWER(@type)"
+                                              : ""
+                                          }
+                                          GROUP BY ticket.type
+                                          HAVING ticket.price IS NOT NULL OR groupTicket.price IS NOT NULL`);
+    // single ticket
+    if (parsed) return stmt.get({ groupTicketDiscount, type });
+    // group ticket
+    else return stmt.all({ groupTicketDiscount });
+  };
+  getAllTickets = () => {
+    return this.getTickets();
+  };
+
+  getTicket = (type: string) => {
+    return this.getTickets(type);
+  };
+
+  getComponentTickets = (type: string) => {
+    return this.connection
+      .prepare(
+        `SELECT tc.component AS "type", tc.qty
+        FROM ticket t
+        JOIN ticketComponent tc
+            ON t.type = tc.component
+        WHERE LOWER(tc.type) = LOWER(?);`
+      )
+      .all(z.string().parse(type));
   };
 
   // NOTE: Ticket shouldn't be updated with the current DB design

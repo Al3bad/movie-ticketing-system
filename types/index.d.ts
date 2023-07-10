@@ -36,7 +36,15 @@ type NewTicket = {
   price?: number;
 };
 
-type Ticket = Required<NewTicket> & { qty: number };
+type Ticket = {
+  type: string;
+  price: number;
+  qty: number;
+};
+
+type GroupTicket = Omit<Ticket> & {
+  components: Omit<Ticket, "price">[];
+};
 
 type UpdateTicket = Modify<
   Ticket,

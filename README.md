@@ -30,4 +30,4 @@
 |   ✅   | PUT /api/movie/:title    | Edit movie info                      |
 |   ✅   | POST /api/ticket/        | Create new ticket type               |
 |   ✅   | GET /api/ticket/         | Get all ticket types                 |
-|        | GET /api/ticket/:type    | Get ticket type by type name         |
+|   ✅   | GET /api/ticket/:type    | Get ticket type                      |
