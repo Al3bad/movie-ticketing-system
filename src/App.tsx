@@ -1,5 +1,4 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "./App.css";
 
 import PurchaseTickets from "./components/pages/PurchaseTickets/PurchaseTickets";
 import TicketList from "./components/pages/TicketList/TicketList";
@@ -12,11 +11,15 @@ import MovieList from "./components/pages/MovieList/MovieList";
 import MovieDetail from "./components/pages/MovieDetail/MovieDetail";
 import Layout from "./components/UI/Layout/Layout";
 import Dashboard from "./components/pages/Dashboard/Dashboard";
+import PageNotFound from "./components/pages/PageNotFound/PageNotFound";
+
+import "./App.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout title="" />,
+    errorElement: <PageNotFound />,
     children: [
       { path: "/", element: <PurchaseTickets /> },
       { path: "/customer", element: <CustomerList /> },

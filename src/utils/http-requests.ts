@@ -15,15 +15,8 @@ class ResponseError extends Error {
   }
 }
 
-// Create a wrapper to handle errors for all http requests
-const httpFetch = async (...options) => {
-  try {
-    const res = await fetch(...options);
-    if (!res.ok) {
-      throw new ResponseError("Fail to load data", res);
-    }
-    return res;
-  } catch (err) {
+const errorHandler = (err) => {
+  if (err.response && err.response.status) {
     switch (err.response.status) {
       case 400:
         console.log("Bad Request");
@@ -38,66 +31,91 @@ const httpFetch = async (...options) => {
         console.log("Internal Server Error");
         break;
       default:
-        console.log(err);
+        console.log("other handled errors", err);
     }
+  } else {
+    console.log(err);
   }
+};
+
+// Create a wrapper to handle errors for all http requests
+const httpFetch = async (...options) => {
+  const res = await fetch(...options);
+  if (!res.ok) {
+    throw new ResponseError("Fail to load data", res);
+  }
+  return res;
 };
 
 export const fetchCustomerByEmail = async (email: string) => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/${email}`;
-  const response = await httpFetch(customer_endpoint);
-  if (response) {
+  try {
+    const response = await httpFetch(customer_endpoint);
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };
 
 export const fetchCustomers = async () => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/`;
-  const response = await httpFetch(customer_endpoint);
-  if (response) {
+  try {
+    const response = await httpFetch(customer_endpoint);
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };
 
 export const fetchMovies = async () => {
   const movies_endpoint = `${BASE_API_ENDPOINT}/movie/`;
-  const response = await httpFetch(movies_endpoint);
-  if (response) {
+  try {
+    const response = await httpFetch(movies_endpoint);
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };
 
 export const fetchTickets = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/ticket/`;
-  const response = await fetch(tickets_endpoint);
-  if (response) {
+  try {
+    const response = await fetch(tickets_endpoint);
     return response.json();
+  } catch (err) {
+    console.log(err);
   }
 };
 
 export const fetchBookings = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/booking/`;
-  const response = await fetch(tickets_endpoint);
-  if (response) {
+  try {
+    const response = await fetch(tickets_endpoint);
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };
 
 export const fetchBookingById = async (id: number) => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/booking/${id}`;
-  const response = await fetch(tickets_endpoint);
-  if (response) {
+  try {
+    const response = await fetch(tickets_endpoint);
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };
 
 export const submitBooking = async (data) => {
   const purchase_ticket_endpoint = `${BASE_API_ENDPOINT}/booking`;
-  const response = await fetch(purchase_ticket_endpoint, {
-    ...post_header,
-    body: JSON.stringify(data),
-  });
-  if (response) {
+  try {
+    const response = await fetch(purchase_ticket_endpoint, {
+      ...post_header,
+      body: JSON.stringify(data),
+    });
     return response.json();
+  } catch (err) {
+    errorHandler(err);
   }
 };

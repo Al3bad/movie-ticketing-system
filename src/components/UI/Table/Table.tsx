@@ -23,8 +23,10 @@ const Table: React.FC<TableProps> = (props) => {
   }
   return (
     <table className={styles.table}>
-      <tr className={styles.table__header}>{headers}</tr>
-      {content}
+      <thead>
+        <tr className={styles.table__header}>{headers}</tr>
+      </thead>
+      <tbody>{content}</tbody>
     </table>
   );
 };

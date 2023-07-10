@@ -1,0 +1,19 @@
+.container {
+  text-align: center;
+}
+
+.container__navbar,
+.container__content {
+  padding: 10px 1%;
+}
+
+@media (min-width: 760px) {
+  .container__navbar,
+  .container__content {
+    padding: 5px 9%;
+  }
+
+  .container__content {
+    margin-top: 20px;
+  }
+}
