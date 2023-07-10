@@ -133,7 +133,7 @@ type ErrorRes = {
 declare namespace Backend {
   type ReqData = {
     name: string;
-    type: "string" | "integer" | "number" | "boolean";
+    type: "string" | "integer" | "number" | "boolean" | "array";
     description: string;
     default?: string | number | boolean;
     required?: boolean;

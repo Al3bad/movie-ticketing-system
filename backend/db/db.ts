@@ -1,7 +1,7 @@
 import {
   NewCustomerSchema,
   NewMovieSchema,
-  NewTicketComponent,
+  // NewTicketComponent,
   NewTicketSchema,
   // TicketSchema,
   UpdateCustomerSchema,
@@ -9,6 +9,7 @@ import {
   NewBookingSchema,
   GetMovieOptionsSchema,
   UpdateMovieSchema,
+  TicketComponentSchema,
 } from "@/common/validations";
 import { faker } from "@faker-js/faker";
 import {
@@ -127,15 +128,15 @@ export class DB {
       {
         type: "Family4",
         components: [
-          { component: "adult", qty: 2 },
-          { component: "child", qty: 2 },
+          { type: "adult", qty: 2 },
+          { type: "child", qty: 2 },
         ],
       },
       {
         type: "Family3",
         components: [
-          { component: "adult", qty: 2 },
-          { component: "child", qty: 1 },
+          { type: "adult", qty: 2 },
+          { type: "child", qty: 1 },
         ],
       },
     ];
@@ -163,18 +164,7 @@ export class DB {
     });
 
     tickets.forEach((ticket) => {
-      if (ticket.components) {
-        this.insertTicket(ticket);
-        ticket.components.forEach((c) =>
-          this.insertTicketComponent({
-            type: ticket.type,
-            component: c.component,
-            qty: c.qty,
-          })
-        );
-      } else {
-        this.insertTicket(ticket);
-      }
+      this.insertTicket(NewTicketSchema.parse(ticket));
     });
 
     customers.forEach((customer) => {
@@ -358,26 +348,39 @@ export class DB {
   // ==============================================
   // ==> Ticket Queries
   // ==============================================
-  insertTicket = (newTicket: NewTicket) => {
-    const { type, price } = NewTicketSchema.parse(newTicket);
+  insertTicket = (newTicket: z.infer<typeof NewTicketSchema>) => {
+    const parsed = NewTicketSchema.parse(newTicket);
+
+    this.connection.prepare("BEGIN TRANSACTION").run();
     const stmt = this.connection.prepare(
-      "INSERT INTO ticket(type, price) VALUES (?,?)"
+      "INSERT INTO ticket(type, price) VALUES (@type,@price)"
     );
-    stmt.run(type, price);
-    return newTicket;
+    stmt.run({ type: parsed.type, price: parsed.price });
+
+    if (parsed.price === null) {
+      // Group ticket
+      for (const component of parsed.components) {
+        this.insertTicketComponent(parsed.type, component);
+      }
+    }
+    this.connection.prepare("COMMIT").run();
+    return parsed;
   };
 
-  insertTicketComponent = (newTicketComponent: NewTicketComponent) => {
-    const parsed = NewTicketComponent.parse(newTicketComponent);
+  insertTicketComponent = (
+    type: string,
+    newTicketComponent: z.infer<typeof TicketComponentSchema>
+  ) => {
+    const parsed = TicketComponentSchema.parse(newTicketComponent);
 
-    if (parsed.type === parsed.component)
+    if (type === parsed.type)
       throw new InvalidTicketComponentError("Invalid data");
 
     this.connection
       .prepare(
         "INSERT INTO ticketComponent (type, component, qty) VALUES (@type,@component,@qty)"
       )
-      .run(parsed);
+      .run({ ...parsed, type, component: parsed.type });
     return parsed;
   };
 
@@ -532,33 +535,32 @@ export class DB {
 
   insertBooking = (newBooking: z.infer<typeof NewBookingSchema>) => {
     const { customer, title, tickets } = NewBookingSchema.parse(newBooking);
-    try {
-      // Start a inTransaction
-      this.connection.prepare("BEGIN").run();
-      // Create new customer, if not exists
-      this.insertCustomer(customer);
-      const booking: { id?: number | bigint } = {};
-      // Insert into booking table
-      booking.id = this.connection
+    // Start a inTransaction
+    this.connection.prepare("BEGIN").run();
+    // Create new customer, if not exists
+    this.insertCustomer(customer);
+    const booking: { id?: number | bigint } = {};
+    // Insert into booking table
+    booking.id = this.connection
+      .prepare(
+        "INSERT INTO booking(customerEmail, movieTitle, discountRate, threshold) VALUES (?,?,?,?)"
+      )
+      .run(
+        customer.email,
+        title,
+        customer.discountRate,
+        customer.threshold
+      ).lastInsertRowid;
+    // Update movies
+    this.updateSeats({
+      title: title,
+      qty: this.calculateRequestedTickets(tickets),
+    });
+    // Insert puchased tickets into "purchased ticket" table
+    for (const { type, qty } of tickets) {
+      this.connection
         .prepare(
-          "INSERT INTO booking(customerEmail, movieTitle, discountRate, threshold) VALUES (?,?,?,?)"
-        )
-        .run(
-          customer.email,
-          title,
-          customer.discountRate,
-          customer.threshold
-        ).lastInsertRowid;
-      // Update movies
-      this.updateSeats({
-        title: title,
-        qty: this.calculateRequestedTickets(tickets),
-      });
-      // Insert puchased tickets into "purchased ticket" table
-      for (const { type, qty } of tickets) {
-        this.connection
-          .prepare(
-            `INSERT INTO purchasedTicket (bookingId, ticketType, ticketPrice, qty)
+          `INSERT INTO purchasedTicket (bookingId, ticketType, ticketPrice, qty)
             VALUES (?,?,(SELECT IFNULL(t.price, SUM(t2.price) * 0.8) AS price
                         FROM ticket t
                         LEFT JOIN ticketComponent tc
@@ -567,17 +569,13 @@ export class DB {
                             ON tc.component = t2.type
                         WHERE t.type = ?),
                     ?)`
-          )
-          .run(booking.id, type, type, qty);
-      }
-      // Commit transaction then return
-      const result = this.getBookingById(booking.id);
-      this.connection.prepare("COMMIT").run();
-      return result;
-    } catch (err: unknown) {
-      this.connection.prepare("ROLLBACK").run();
-      throw err;
+        )
+        .run(booking.id, type, type, qty);
     }
+    // Commit transaction then return
+    const result = this.getBookingById(booking.id);
+    this.connection.prepare("COMMIT").run();
+    return result;
   };
 
   getAllBooking = () => {

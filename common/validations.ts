@@ -32,25 +32,48 @@ export const UpdateMovieSchema = z.object({
 // ==============================================
 // --> Ticket schemas
 // ==============================================
+const NewSingleSchema = z
+  .object({
+    type: z.string().toLowerCase().trim(),
+    price: z.number().positive(),
+  })
+  .strict({
+    message: "Only 'type' and 'price' are allowed for a single type ticket",
+  });
 
-export const NewTicketSchema = z.object({
-  type: z.string().toLowerCase(),
-  price: z.number().positive().nullish().default(null),
+export const TicketComponentSchema = NewSingleSchema.omit({
+  price: true,
+}).extend({
+  qty: z.number().nonnegative().int(),
 });
 
-export const TicketSchema = NewTicketSchema.extend({
-  qty: z.number().positive(),
+const NewGroupTicketSchema = z.object({
+  type: z.string().toLowerCase().trim(),
+  price: z.undefined().optional().nullish().default(null),
+  components: z.array(TicketComponentSchema).min(1),
 });
 
-export const GroupTicketSchema = NewTicketSchema.extend({
-  components: z.array(TicketSchema),
+export const NewTicketSchema = z.union([NewSingleSchema, NewGroupTicketSchema]);
+
+export const RequestedTicket = z.object({
+  type: z.string().toLowerCase().trim(),
+  qty: z.number().positive().int(),
 });
 
-export const NewTicketComponent = z.object({
-  type: z.string().toLowerCase(),
-  component: z.string().toLowerCase(),
-  qty: z.number().int().positive(),
-});
+// export const TicketSchema = NewTicketSchema.extend({
+//   qty: z.number().positive(),
+// });
+//
+//
+// export const NewTicketComponent = z.object({
+//   type: z.string().toLowerCase(),
+//   component: z.string().toLowerCase(),
+//   qty: z.number().int().positive(),
+// });
+
+// export const GroupTicketSchema = NewTicketSchema.extend({
+//   components: z.array(TicketSchema),
+// });
 
 // ==============================================
 // --> Customer schemas
@@ -135,7 +158,7 @@ export const NewBookingSchema = z.object({
     StepCustomerSchema,
   ]),
   title: z.string(),
-  tickets: z.array(TicketSchema).min(1),
+  tickets: z.array(RequestedTicket).min(1),
 });
 
 export const BookingSchema = NewBookingSchema.extend({

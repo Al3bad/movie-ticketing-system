@@ -8,6 +8,7 @@ import {
   DuplicationError,
 } from "./errors";
 import { httpStatus } from "server";
+import db from "backend/db/db";
 
 export const cors = (_: Request, res: Response, next: NextFunction) => {
   // reference: https://stackoverflow.com/a/7069902
@@ -39,6 +40,9 @@ export const errorHandler = (
   res: Response,
   __: NextFunction
 ) => {
+  // Rollback if the DB in transaction
+  if (db.connection.inTransaction) db.connection.prepare("ROLLBACK").run();
+  // ---------------------------------
   if (err instanceof ZodError) {
     // thrown from:
     //    - database interface methods (db.ts file)
@@ -48,15 +52,27 @@ export const errorHandler = (
     //    - invalid input to route
     // action:
     //    - respond with and error message mentioning the invalid values
-    const issues = err.issues.map((issue) => {
-      return {
-        path: issue.path,
-        msg: issue.message,
-      };
+    const normalisedIssues: any = [];
+    err.issues.forEach((issue) => {
+      if (issue.code === "invalid_union") {
+        issue.unionErrors.forEach((unionIssues) => {
+          unionIssues.issues.forEach((unionIssue) => {
+            normalisedIssues.push({
+              path: unionIssue.path,
+              msg: unionIssue.message,
+            });
+          });
+        });
+      } else {
+        normalisedIssues.push({
+          path: issue.path,
+          msg: issue.message,
+        });
+      }
     });
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ error: { msg: "Invalid data", details: { issues } } });
+    return res.status(httpStatus.BAD_REQUEST).json({
+      error: { msg: "Invalid data", details: { issues: normalisedIssues } },
+    });
   } else if (err instanceof NotFoundResourceError) {
     // thrown from:
     //    - database interface methods (db.ts file)
