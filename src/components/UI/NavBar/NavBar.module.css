@@ -2,6 +2,7 @@
   width: 100%;
   color: var(--gray-200);
   padding: 10px 0;
+  background-color: var(--gray-800);
 }
 
 .navbar__user-profile {

@@ -6,6 +6,7 @@ import Icon from "../Icon/Icon";
 
 type NavBarProps = {
   active: string;
+  className?: string;
 };
 
 const NavBar: React.FC<NavBarProps> = (props) => {
@@ -102,7 +103,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
   );
 
   return (
-    <div className={styles.navbar}>
+    <div className={`${styles.navbar} ${props.className}`}>
       {isMobile && (
         <>
           <div className={styles["navbar__mobile-header"]}>
