@@ -8,6 +8,7 @@ import {
   PaginationOptsSchema,
   NewBookingSchema,
   GetMovieOptionsSchema,
+  UpdateMovieSchema,
 } from "@/common/validations";
 import { faker } from "@faker-js/faker";
 import {
@@ -79,6 +80,7 @@ export class DB {
           this.connection.prepare("DROP TABLE IF EXISTS " + table.name).run();
       });
     } catch (err: unknown) {
+      console.log(err);
       console.error("[ERROR] Couldn't drop tables!");
       process.exit(1);
     }
@@ -320,17 +322,17 @@ export class DB {
     }
   };
 
-  updateMovie = ({
-    title,
-    seatAvailable = null,
-    isReleased = null,
-  }: UpdateMovie) => {
+  updateMovie = (
+    title: string,
+    newMovieInfo: z.infer<typeof UpdateMovieSchema>
+  ) => {
+    const newInfo = UpdateMovieSchema.parse(newMovieInfo);
     try {
       const info = this.connection
         .prepare(
-          "UPDATE movie SET title = IFNULL(?, title), seatAvailable = IFNULL(?, seatAvailable), isReleased = IFNULL(?, isReleased)"
+          "UPDATE movie SET title = IFNULL(@newTitle, title), seatAvailable = IFNULL(@seatAvailable, seatAvailable), isReleased = IFNULL(@isReleased, isReleased) WHERE title = @title"
         )
-        .run(title, seatAvailable, isReleased);
+        .run({ ...newInfo, title, newTitle: newInfo.title });
       if (info.changes === 0) return undefined;
       else return info;
     } catch (err: unknown) {
@@ -350,10 +352,10 @@ export class DB {
     }
   };
 
-  deleteMovie = (title: string) => {
-    // TODO:
-    return title;
-  };
+  // NOTE: Movie can't be deleted due to the FK constrains
+  // deleteMovie = (title: string) => {
+  //   return title;
+  // };
 
   // ==============================================
   // ==> Ticket Queries
@@ -400,20 +402,20 @@ export class DB {
     return stmt.all(groupTicketDiscount) as Ticket[];
   };
 
-  updateTicket = (ticket: UpdateTicket) => {
-    // TODO:
-    return ticket;
-  };
+  // NOTE: Ticket shouldn't be updated with the current DB design
+  // updateTicket = (ticket: UpdateTicket) => {
+  //   return ticket;
+  // };
 
-  updateTicketComponent = (ticketComponent: TicketComponent) => {
-    // TODO:
-    return ticketComponent;
-  };
+  // NOTE: Ticket component shouldn't be updated with the current DB design
+  // updateTicketComponent = (ticketComponent: TicketComponent) => {
+  //   return ticketComponent;
+  // };
 
-  deleteTicket = (type: string) => {
-    // TODO:
-    return type;
-  };
+  // NOTE: Ticket can't be deleted due to the FK constrains
+  // deleteTicket = (type: string) => {
+  //   return type;
+  // };
 
   // ==============================================
   // ==> Customer Queries

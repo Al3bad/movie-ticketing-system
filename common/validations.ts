@@ -24,6 +24,12 @@ export const MovieSchema = NewMovieSchema.extend({
   id: z.number(),
 });
 
+export const UpdateMovieSchema = z.object({
+  title: z.string().trim().optional().nullable().default(null),
+  seatAvailable: z.string().optional().nullable().default(null),
+  isReleased: z.boolean().optional().nullable().default(null),
+});
+
 // ==============================================
 // --> Ticket schemas
 // ==============================================

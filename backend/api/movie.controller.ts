@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as z from "zod";
 import db from "backend/db/db";
 import { httpStatus } from "server";
-import { GetMovieOptionsSchema } from "@/common/validations";
+import { GetMovieOptionsSchema, UpdateMovieSchema } from "@/common/validations";
 import { NotFoundResourceError } from "backend/lib/errors";
 
 export const getAllMovies = (req: Request, res: Response) => {
@@ -22,4 +22,17 @@ export const getMovie = (req: Request, res: Response) => {
     );
   }
   return res.status(httpStatus.OK).json(movie);
+};
+
+export const updateMovie = (req: Request, res: Response) => {
+  const title = z.string().parse(req.params.title);
+  const parsed = UpdateMovieSchema.parse(req.body);
+  const result = db.updateMovie(title, parsed);
+  if (!result) {
+    throw new NotFoundResourceError(
+      `Movie with title = '${title}' is not found!`,
+      "movie"
+    );
+  }
+  return res.status(httpStatus.OK).json({ changes: result.changes });
 };
