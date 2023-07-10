@@ -12,7 +12,7 @@ const menuItems = [
   },
   {
     title: "Purchase Ticket",
-    url: "/purchase-ticket",
+    url: "/",
     icon: "cart",
   },
   {
