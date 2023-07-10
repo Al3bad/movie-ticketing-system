@@ -58,13 +58,14 @@ export const updateCustomers = (req: Request, res: Response) => {
   return res.status(httpStatus.OK).json({ changes: result.changes });
 };
 
-export const deleteCustomer = (req: Request, res: Response) => {
-  const email = z.string().email().parse(req.params.email);
-  const result = db.deleteCustomer(email);
-  if (!result)
-    throw new NotFoundResourceError(
-      `Customer with email = '${email}' is not found!`,
-      "customer"
-    );
-  return res.status(httpStatus.NO_CONTENT).json({ changes: result.changes });
-};
+// NOTE: Customer can't be deleted due to the FK constrains
+// export const deleteCustomer = (req: Request, res: Response) => {
+//   const email = z.string().email().parse(req.params.email);
+//   const result = db.deleteCustomer(email);
+//   if (!result)
+//     throw new NotFoundResourceError(
+//       `Customer with email = '${email}' is not found!`,
+//       "customer"
+//     );
+//   return res.status(httpStatus.NO_CONTENT).json({ changes: result.changes });
+// };

@@ -508,15 +508,16 @@ export class DB {
       .run(z.number().positive().parse(newThreshold));
   };
 
-  deleteCustomer = (email: string) => {
-    const info = this.connection
-      .prepare("DELETE FROM customer WHERE LOWER(email) = LOWER(?)")
-      .run(z.string().email().parse(email));
-    if (info.changes === 0) {
-      return undefined;
-    }
-    return info;
-  };
+  // NOTE: Customer can't be deleted due to the FK constrains
+  // deleteCustomer = (email: string) => {
+  //   const info = this.connection
+  //     .prepare("DELETE FROM customer WHERE LOWER(email) = LOWER(?)")
+  //     .run(z.string().email().parse(email));
+  //   if (info.changes === 0) {
+  //     return undefined;
+  //   }
+  //   return info;
+  // };
 
   // ==============================================
   // ==> Booking Queries

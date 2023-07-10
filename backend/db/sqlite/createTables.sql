@@ -49,11 +49,9 @@ CREATE TABLE IF NOT EXISTS booking (
     threshold REAL,
     -- FKs
     FOREIGN KEY (customerEmail) REFERENCES customer(email)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON UPDATE CASCADE,
     FOREIGN KEY (movieTitle) REFERENCES movie(title)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS purchasedTicket (
@@ -68,6 +66,5 @@ CREATE TABLE IF NOT EXISTS purchasedTicket (
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     FOREIGN KEY (ticketType) REFERENCES ticket (type)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON UPDATE CASCADE
 );
