@@ -28,6 +28,6 @@
 |   ✅   | GET /api/movie/          | Get all movies                       |
 |   ✅   | GET /api/movie/:title    | Get movie by title                   |
 |   ✅   | PUT /api/movie/:title    | Edit movie info                      |
-|        | POST /api/ticket/        | Create new ticket type               |
+|   ✅   | POST /api/ticket/        | Create new ticket type               |
 |   ✅   | GET /api/ticket/         | Get all ticket types                 |
 |        | GET /api/ticket/:type    | Get ticket type by type name         |
