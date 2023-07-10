@@ -31,3 +31,20 @@
 |   ✅   | POST /api/ticket/        | Create new ticket type               |
 |   ✅   | GET /api/ticket/         | Get all ticket types                 |
 |   ✅   | GET /api/ticket/:type    | Get ticket type                      |
+
+---
+
+# TODO
+
+- [ ] Improve format of the error responses
+- [ ] Generate types from zod schemas
+- [ ] Cleanup unused types
+- [ ] Cleanup code and make it consistent
+- [ ] Test /api/customer/... endpoints
+- [ ] Test /api/movie/... endpoints
+- [ ] Test /api/ticket/... endpoints
+- [ ] Test /api/booking/... endpoints
+
+# Server Structure
+
+[High level structure of the server](./images/server-structure.png)
