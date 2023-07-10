@@ -1,11 +1,11 @@
 .message {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .message--error {
-    color: var(--error-color);
+  color: var(--red);
 }
 
 .message--success {
-    color: var(--success-color);
+  color: var(--green);
 }

@@ -1,67 +1,67 @@
 .button {
-    width: 100%;
-    border-radius: var(--input-border-radius);
-    height: var(--input-height);
-    font-size: var(--font-size);
-    box-shadow: none;
-    cursor: pointer;
+  width: 100%;
+  border-radius: var(--input-border-radius);
+  height: var(--input-height);
+  font-size: var(--font-size);
+  box-shadow: none;
+  cursor: pointer;
 }
 
 /* Primary Button */
 .button--primary {
-    background-color: var(--primary);
-    color: rgba(249, 250, 252, 1);
-    border: none;
+  background-color: var(--primary);
+  color: white;
+  border: none;
 }
 
 .button--primary:hover {
-    background-color: rgba(41, 82, 176, 1);
-    transition: background-color ease-in-out 0.15s;
+  background-color: rgba(41, 82, 176, 1);
+  transition: background-color ease-in-out 0.15s;
 }
 
 .button--primary:disabled {
-    background-color: rgba(160, 182, 231, 1);
+  background-color: rgba(160, 182, 231, 1);
 }
 
 /* Secondary Button */
 
 .button--secondary {
-    background-color: var(--secondary);
-    border: 2px solid rgba(30, 38, 47, 1);
-    color: rgba(30, 38, 47, 1);
+  background-color: var(--secondary);
+  border: 2px solid var(--gray-800);
+  color: var(--gray-800);
 }
 
 .button--secondary:hover {
-    background-color: rgba(231, 236, 244, 1);
-    color: rgba(66, 78, 93, 1);
-    border: 2px solid rgba(66, 78, 93, 1);
-    transition: background-color ease-in-out 0.15s;
+  background-color: var(--gray-100);
+  color: var(--gray-600);
+  border: 2px solid var(--gray-600);
+  transition: background-color ease-in-out 0.15s;
 }
 
 .button--secondary:disabled {
-    background-color: rgba(231, 236, 244, 1);
-    color: rgba(165, 180, 197, 1);
-    border: 2px solid rgba(165, 180, 197, 1);
+  background-color: var(--gray-100);
+  color: var(--gray-400);
+  border: 2px solid var(--gray-400);
 }
 
 .button--secondary--icon {
-    border-color: rgba(200, 211, 224, 1);
-    margin-bottom: 8px;
+  border-color: var(--gray-300);
+  margin-bottom: 8px;
 }
 
 .button--secondary--icon:hover {
-    border-color: rgba(200, 211, 224, 1);
+  border-color: var(--gray-300);
 }
 /* Multiple Input Button */
 
 .button.button--multi-inputs-l.button--secondary,
 .button.button--multi-inputs-l.button--primary {
-    border: none;
-    border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
+  border: none;
+  border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
 }
 
 .button.button--multi-inputs-r.button--secondary,
 .button.button--multi-inputs-r.button--primary {
-    border: none;
-    border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
+  border: none;
+  border-radius: 0 var(--input-border-radius) var(--input-border-radius) 0;
 }

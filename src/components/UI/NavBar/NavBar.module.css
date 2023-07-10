@@ -1,0 +1,87 @@
+.navbar {
+  width: 100%;
+  color: var(--gray-200);
+  padding: 10px 0;
+}
+
+.navbar__user-profile {
+  height: 40px;
+  width: 40px;
+}
+
+.navbar__user-profile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.navbar__mobile-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar__menu {
+  list-style-type: none;
+  transition: ease-in-out 0.3s;
+  height: 100vh;
+  margin-top: 2%;
+}
+.navbar__menu li {
+  margin: 15px 10px;
+  display: flex;
+}
+
+.navbar__menu li span {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.navbar__menu li a {
+  color: var(--gray-200);
+  text-decoration: none;
+}
+
+.navbar__menu li a:hover {
+  color: var(--gray-400);
+  transition: color ease-in-out 1ms;
+}
+
+.navbar__menu li a.active {
+  text-decoration: underline;
+}
+
+.navbar__menu-icon {
+  transition: ease-in-out 0.3s;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.navbar__menu-icon:hover {
+  cursor: pointer;
+  color: black;
+}
+@media (min-width: 760px) {
+  .navbar,
+  .navbar__menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar {
+    padding: 5px 0;
+  }
+
+  .navbar__menu {
+    height: auto;
+    margin-top: 0;
+  }
+
+  .navbar__menu li span {
+    display: none;
+  }
+}

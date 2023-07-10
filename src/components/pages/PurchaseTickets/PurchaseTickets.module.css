@@ -3,7 +3,7 @@
 }
 
 .purchase-tickets__block {
-  background-color: rgba(231, 236, 244, 1);
+  background-color: var(--gray-100);
   padding: 3% 1%;
 }
 

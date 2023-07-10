@@ -1,7 +1,5 @@
-import Layout from "../../UI/Layout/Layout";
-
 const BookingList = () => {
-  return <Layout title="Bookings"></Layout>;
+  return <div>Bookings</div>;
 };
 
 export default BookingList;
