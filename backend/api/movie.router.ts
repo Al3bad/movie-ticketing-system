@@ -86,6 +86,29 @@ const routes: Backend.Route[] = [
     ],
     controller: controller.updateMovie,
   },
+  {
+    method: "post",
+    endpoint: "/",
+    description: "Create new movie",
+    json: [
+      {
+        name: "title",
+        type: "string",
+        description: "New title of the specified movie",
+      },
+      {
+        name: "seatAvailable",
+        type: "integer",
+        description: "Initial number of seats available",
+      },
+      {
+        name: "isReleased",
+        type: "boolean",
+        description: "Specifies whether the movie is released or not",
+      },
+    ],
+    controller: controller.createMovie,
+  },
 ];
 
 export default initRouter("/api/movie", routes);

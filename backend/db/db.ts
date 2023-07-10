@@ -234,12 +234,11 @@ export class DB {
   // ==============================================
   insertMovie = (newMovie: Movie) => {
     try {
-      const { title, seatAvailable, isReleased } =
-        NewMovieSchema.parse(newMovie);
+      const parsed = NewMovieSchema.parse(newMovie);
       const stmt = this.connection.prepare(
-        "INSERT INTO movie(title, seatAvailable, isReleased) VALUES (?,?,?)"
+        "INSERT INTO movie(title, seatAvailable, isReleased) VALUES (@title,@seatAvailable,@isReleased)"
       );
-      stmt.run(title, seatAvailable, isReleased ? 1 : 0);
+      stmt.run({ ...parsed, isReleased: parsed.isReleased ? 1 : 0 });
       return newMovie;
     } catch (err: unknown) {
       if (
@@ -252,9 +251,8 @@ export class DB {
             message: "seatAvailable must be a positive number",
           },
         ]);
-      } else {
-        throw err;
       }
+      throw err;
     }
   };
 

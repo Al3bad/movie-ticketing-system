@@ -13,21 +13,20 @@ export const GetMovieOptionsSchema = z.object({
 // ==============================================
 // --> Movie schemas
 // ==============================================
+const SeatsAvailableSchema = z.number().int().nonnegative();
 
-export const NewMovieSchema = z.object({
+export const MovieSchema = z.object({
   title: z.string(),
-  seatAvailable: z.number().nonnegative(),
+  seatAvailable: SeatsAvailableSchema,
   isReleased: z.boolean(),
 });
 
-export const MovieSchema = NewMovieSchema.extend({
-  id: z.number(),
-});
+export const NewMovieSchema = MovieSchema;
 
 export const UpdateMovieSchema = z.object({
-  title: z.string().trim().optional().nullable().default(null),
-  seatAvailable: z.string().optional().nullable().default(null),
-  isReleased: z.boolean().optional().nullable().default(null),
+  title: z.string().trim().nullish().default(null),
+  seatAvailable: SeatsAvailableSchema.nullish().default(null),
+  isReleased: z.boolean().nullish().default(null),
 });
 
 // ==============================================
@@ -36,7 +35,7 @@ export const UpdateMovieSchema = z.object({
 
 export const NewTicketSchema = z.object({
   type: z.string().toLowerCase(),
-  price: z.number().positive().optional().nullable().default(null),
+  price: z.number().positive().nullish().default(null),
 });
 
 export const TicketSchema = NewTicketSchema.extend({
@@ -77,35 +76,35 @@ export const StepCustomerSchema = FlatCustomerSchema.extend({
 
 export const NewCustomerSchema = z.union([
   NormalCustomerSchema.extend({
-    threshold: z.literal(null).optional().nullable().default(null),
+    threshold: z.literal(null).nullish().default(null),
   }),
   FlatCustomerSchema.extend({
-    threshold: z.literal(null).optional().nullable().default(null),
+    threshold: z.literal(null).nullish().default(null),
   }),
   StepCustomerSchema,
 ]);
 
 export const UpdateCustomerSchema = z
   .object({
-    newEmail: z.string().email().optional().nullable().default(null),
-    name: z.string().optional().nullable().default(null),
+    newEmail: z.string().email().nullish().default(null),
+    name: z.string().nullish().default(null),
     type: z.literal("Normal"),
   })
   .or(
     z.object({
-      newEmail: z.string().email().optional().nullable().default(null),
-      name: z.string().optional().nullable().default(null),
+      newEmail: z.string().email().nullish().default(null),
+      name: z.string().nullish().default(null),
       type: z.literal("Flat"),
-      discountRate: z.number().gt(0).lte(1).optional().nullable().default(null),
+      discountRate: z.number().gt(0).lte(1).nullish().default(null),
     })
   )
   .or(
     z.object({
-      newEmail: z.string().email().optional().nullable().default(null),
-      name: z.string().optional().nullable().default(null),
+      newEmail: z.string().email().nullish().default(null),
+      name: z.string().nullish().default(null),
       type: z.literal("Step"),
-      discountRate: z.number().gt(0).lte(1).optional().nullable().default(null),
-      threshold: z.number().positive().optional().nullable().default(null),
+      discountRate: z.number().gt(0).lte(1).nullish().default(null),
+      threshold: z.number().positive().nullish().default(null),
     })
   );
 
@@ -128,10 +127,10 @@ export const UpdateCustomersSchema = z
 export const NewBookingSchema = z.object({
   customer: z.union([
     NormalCustomerSchema.extend({
-      threshold: z.literal(null).optional().nullable().default(null),
+      threshold: z.literal(null).nullish().default(null),
     }),
     FlatCustomerSchema.extend({
-      threshold: z.literal(null).optional().nullable().default(null),
+      threshold: z.literal(null).nullish().default(null),
     }),
     StepCustomerSchema,
   ]),
