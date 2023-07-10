@@ -1,7 +1,7 @@
 .navbar {
   width: 100%;
   color: var(--gray-200);
-  padding: 1.5% 0;
+  padding: 10px 0;
 }
 
 .navbar__user-profile {
@@ -29,7 +29,7 @@
   margin-top: 2%;
 }
 .navbar__menu li {
-  margin: 15px;
+  margin: 15px 10px;
   display: flex;
 }
 
@@ -38,10 +38,31 @@
   margin-right: 10px;
 }
 
-.navbar__menu-icon {
-  transition: ease-in-out 0.3s;
+.navbar__menu li a {
+  color: var(--gray-200);
+  text-decoration: none;
 }
 
+.navbar__menu li a:hover {
+  color: var(--gray-400);
+  transition: color ease-in-out 1ms;
+}
+
+.navbar__menu li a.active {
+  text-decoration: underline;
+}
+
+.navbar__menu-icon {
+  transition: ease-in-out 0.3s;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.navbar__menu-icon:hover {
+  cursor: pointer;
+  color: black;
+}
 @media (min-width: 760px) {
   .navbar,
   .navbar__menu {
@@ -50,6 +71,11 @@
     justify-content: space-between;
     align-items: center;
   }
+
+  .navbar {
+    padding: 5px 0;
+  }
+
   .navbar__menu {
     height: auto;
     margin-top: 0;

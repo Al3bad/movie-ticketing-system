@@ -83,6 +83,14 @@ const NavBar: React.FC<NavBarProps> = (props) => {
         </Link>
       </li>
       <li>
+        <Link to="/movie">
+          <span>
+            <Icon name="movie" />
+          </span>
+          Movies
+        </Link>
+      </li>
+      <li>
         <Link to="/booking">
           <span>
             <Icon name="clock" />
@@ -100,7 +108,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
           <div className={styles["navbar__mobile-header"]}>
             {userProfile}
             <div
-              className={styles["navBar__menu-icon"]}
+              className={styles["navbar__menu-icon"]}
               onClick={toggleMenuHandler}
             >
               <Icon name={isMenuShown ? "close" : "hamburger"} />

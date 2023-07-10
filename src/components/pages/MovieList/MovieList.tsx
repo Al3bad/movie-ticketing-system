@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { fetchMovies } from "../../../utils/http-requests";
-import Layout from "../../UI/Layout/Layout";
 import Table from "../../UI/Table/Table";
 
 const MovieList = () => {
@@ -16,11 +15,7 @@ const MovieList = () => {
       setMovies(movieList);
     }
   };
-  return (
-    <Layout title="Movies">
-      <Table type="movie" values={movies}></Table>;
-    </Layout>
-  );
+  return <Table type="movie" values={movies}></Table>;
 };
 
 export default MovieList;

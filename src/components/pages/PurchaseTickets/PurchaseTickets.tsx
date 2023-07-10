@@ -7,7 +7,6 @@ import MultipleInputs from "../../UI/MultipleInputs/MultipleInputs";
 import Input from "../../UI/Input/Input";
 import Message from "../../UI/Message/Message";
 import Icon from "../../UI/Icon/Icon";
-import Layout from "../../UI/Layout/Layout";
 import {
   fetchCustomerByEmail,
   fetchMovies,
@@ -208,91 +207,89 @@ const PurchaseTickets = () => {
   };
 
   return (
-    <Layout title="Purchase Ticket">
-      <div className={styles["purchase-tickets"]}>
-        <div
-          className={`${styles["purchase-tickets"]} ${styles["purchase-tickets__block"]}`}
-        >
-          {msg && <Message msg={msg.text} type={msg.type} />}
+    <div className={styles["purchase-tickets"]}>
+      <div
+        className={`${styles["purchase-tickets"]} ${styles["purchase-tickets__block"]}`}
+      >
+        {msg && <Message msg={msg.text} type={msg.type} />}
 
-          <form onSubmit={purchaseTicketHandler}>
-            <MultipleInputs
-              label="Customer Email"
-              type="input-w-btn"
-              onButtonClick={fetchCustomerHandler}
-              onInputChange={inputChangeHandler}
-            />
+        <form onSubmit={purchaseTicketHandler}>
+          <MultipleInputs
+            label="Customer Email"
+            type="input-w-btn"
+            onButtonClick={fetchCustomerHandler}
+            onInputChange={inputChangeHandler}
+          />
 
-            {/* Display Customer name and type only when customer info is fetched */}
-            {isCustomerFetched && (
-              <>
-                {/* 
+          {/* Display Customer name and type only when customer info is fetched */}
+          {isCustomerFetched && (
+            <>
+              {/* 
               TO DO: 
                 Fetch Customer Name from Backend, 
                 Set disabled state based on customer response info 
               */}
-                <Input
-                  label="Customer Name"
-                  type="text"
-                  onInputChange={inputChangeHandler}
-                />
+              <Input
+                label="Customer Name"
+                type="text"
+                onInputChange={inputChangeHandler}
+              />
 
-                {/* 
+              {/* 
               TO DO: 
                 Fetch Customer Types from Backend, 
                 Replace DUMMY data,
                 Set disabled state based on customer response info 
               */}
-                <Dropdown
-                  label="Customer Type"
-                  options={DUMMY_CUSTOMER_TYPES}
-                  onInputChange={inputChangeHandler}
-                />
-              </>
-            )}
+              <Dropdown
+                label="Customer Type"
+                options={DUMMY_CUSTOMER_TYPES}
+                onInputChange={inputChangeHandler}
+              />
+            </>
+          )}
 
-            {/* 
+          {/* 
           TO DO: 
             Fetch Movies from Backend,
             Replace DUMMY data 
           */}
-            <Dropdown
-              label="Movie"
-              options={data.movies}
-              onInputChange={inputChangeHandler}
+          <Dropdown
+            label="Movie"
+            options={data.movies}
+            onInputChange={inputChangeHandler}
+          />
+
+          <p>Tickets</p>
+          {/* Dynamically generate a list of ticket inputs */}
+          {ticketInputIds.map((id) => (
+            <MultipleInputs
+              key={id}
+              label="Tickets"
+              hide_label={true}
+              options={data.ticketTypes}
+              type="dropdown-w-input"
+              onInputChange={(label: string, val: string) =>
+                inputChangeHandler(label, val, id)
+              }
             />
+          ))}
 
-            <p>Tickets</p>
-            {/* Dynamically generate a list of ticket inputs */}
-            {ticketInputIds.map((id) => (
-              <MultipleInputs
-                key={id}
-                label="Tickets"
-                hide_label={true}
-                options={data.ticketTypes}
-                type="dropdown-w-input"
-                onInputChange={(label: string, val: string) =>
-                  inputChangeHandler(label, val, id)
-                }
-              />
-            ))}
+          <Button
+            type="button"
+            label="Add New Ticket"
+            classLabels={["secondary", "secondary--icon"]}
+            onButtonClick={addNewTicketsHandler}
+          >
+            <Icon name="add" />
+          </Button>
 
-            <Button
-              type="button"
-              label="Add New Ticket"
-              classLabels={["secondary", "secondary--icon"]}
-              onButtonClick={addNewTicketsHandler}
-            >
-              <Icon name="add" />
-            </Button>
-
-            <Button type="submit" classLabels={["primary"]}>
-              Purchase
-            </Button>
-          </form>
-        </div>
+          <Button type="submit" classLabels={["primary"]}>
+            Purchase
+          </Button>
+        </form>
       </div>
-    </Layout>
+    </div>
   );
 };
 

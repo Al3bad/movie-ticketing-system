@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 import styles from "./Layout.module.css";
 import NavBar from "../NavBar/NavBar";
@@ -16,7 +17,9 @@ const Layout: React.FC<LayoutProps> = (props) => {
       <header className={styles.container__title}>
         <h1>{props.title}</h1>
       </header>
-      <section className={styles.container__content}>{props.children}</section>
+      <section className={styles.container__content}>
+        <Outlet />
+      </section>
     </main>
   );
 };

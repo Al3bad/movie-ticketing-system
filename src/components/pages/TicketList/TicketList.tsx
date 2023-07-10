@@ -1,7 +1,5 @@
-import Layout from "../../UI/Layout/Layout";
-
 const TicketList = () => {
-  return <Layout title="Tickets"></Layout>;
+  return <div>Ticket List</div>;
 };
 
 export default TicketList;
