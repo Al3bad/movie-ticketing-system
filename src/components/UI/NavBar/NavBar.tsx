@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import user_profile from "../../../assets/user_profile.png";
 import Icon from "../Icon/Icon";
@@ -87,12 +87,15 @@ const NavBar: React.FC<NavBarProps> = (props) => {
       {menuItems.map((item, id) => {
         return (
           <li key={id}>
-            <Link to={item.url}>
-              <span>
-                <Icon name={item.icon} />
-              </span>
+            <span>
+              <Icon name={item.icon} />
+            </span>
+            <NavLink
+              to={item.url}
+              className={({ isActive }) => (isActive ? styles.active : "")}
+            >
               {item.title}
-            </Link>
+            </NavLink>
           </li>
         );
       })}
