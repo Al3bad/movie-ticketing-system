@@ -17,22 +17,22 @@ const menuItems = [
   },
   {
     title: "Customer",
-    url: "/customer",
+    url: "/customers",
     icon: "customer",
   },
   {
     title: "Tickets",
-    url: "/ticket",
+    url: "/tickets",
     icon: "ticket",
   },
   {
     title: "Movies",
-    url: "/movie",
+    url: "/movies",
     icon: "movie",
   },
   {
     title: "Bookings",
-    url: "/booking",
+    url: "/bookings",
     icon: "clock",
   },
 ];
