@@ -3,6 +3,7 @@ import { fetchBookings } from "../../../utils/http-requests";
 import Table from "../../UI/Table/Table";
 
 const table_headers = [
+  { title: "Id", key: "id" },
   { title: "Name", key: "name" },
   { title: "Movie", key: "movie" },
   { title: "Email", key: "email" },
@@ -21,6 +22,7 @@ const BookingList = () => {
     if (bookingList) {
       const bookingValues = bookingList.map((booking: Booking) => {
         return {
+          id: booking.id,
           email: booking.customer.email,
           name: booking.customer.name,
           movie: booking.title,
@@ -39,7 +41,11 @@ const BookingList = () => {
     return sumTicketQty;
   };
 
-  return <Table headers={table_headers} values={bookings}></Table>;
+  return (
+    <>
+      <Table headers={table_headers} values={bookings} id="id"></Table>
+    </>
+  );
 };
 
 export default BookingList;

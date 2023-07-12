@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import styles from "./NavBar.module.css";
 import user_profile from "../../../assets/user_profile.png";
 import Icon from "../Icon/Icon";
@@ -7,32 +7,32 @@ import Icon from "../Icon/Icon";
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "dashboard",
     icon: "dashboard",
   },
   {
     title: "Purchase Ticket",
-    url: "/",
+    url: "",
     icon: "cart",
   },
   {
     title: "Customer",
-    url: "/customer",
+    url: "customers",
     icon: "customer",
   },
   {
     title: "Tickets",
-    url: "/ticket",
+    url: "tickets",
     icon: "ticket",
   },
   {
     title: "Movies",
-    url: "/movie",
+    url: "movies",
     icon: "movie",
   },
   {
     title: "Bookings",
-    url: "/booking",
+    url: "bookings",
     icon: "clock",
   },
 ];
@@ -87,12 +87,15 @@ const NavBar: React.FC<NavBarProps> = (props) => {
       {menuItems.map((item, id) => {
         return (
           <li key={id}>
-            <Link to={item.url}>
-              <span>
-                <Icon name={item.icon} />
-              </span>
+            <span>
+              <Icon name={item.icon} />
+            </span>
+            <NavLink
+              to={item.url}
+              className={({ isActive }) => (isActive ? styles.active : "")}
+            >
               {item.title}
-            </Link>
+            </NavLink>
           </li>
         );
       })}

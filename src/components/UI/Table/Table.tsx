@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Table.module.css";
 
 type Header = {
@@ -9,6 +10,9 @@ type Header = {
 type TableProps = {
   values: any;
   headers: Header[];
+  // key of the value that will be used to navigate to Detail pages
+  // e.g: customerDetail: email, movie: title, booking: id,...
+  id: any;
 };
 
 const Table: React.FC<TableProps> = (props) => {
@@ -53,26 +57,36 @@ const Table: React.FC<TableProps> = (props) => {
   };
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr className={styles.table__header}>
-          {headerValues.map((header) => (
-            <th key={header.key}>{header.title}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {props.values.map((movie: Movie, movie_id: number) => {
-          return (
-            <tr key={movie_id} className={styles.table__content}>
-              {headerValues.map((header, header_id: number) => {
-                return <td key={header_id}>{movie[header.key]}</td>;
-              })}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <>
+      <p className={styles.table__total}>
+        <b>Total: {props.values.length}</b>
+      </p>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.table__header}>
+            {headerValues.map((header) => (
+              <th key={header.key}>{header.title}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {props.values.map((value) => {
+            return (
+              <tr key={value[props.id]} className={styles.table__content}>
+                {headerValues.map((header, header_id: number) => {
+                  console.log("id ", value[props.id]);
+                  return (
+                    <td key={header_id}>
+                      <Link to={`${value[props.id]}`}>{value[header.key]}</Link>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 };
 

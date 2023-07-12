@@ -41,7 +41,7 @@
 .navbar__menu li a {
   color: var(--gray-200);
   text-decoration: none;
-  display: flex;
+  display: inline-block;
 }
 
 .navbar__menu li a:hover {
@@ -50,7 +50,7 @@
 }
 
 .navbar__menu li a.active {
-  text-decoration: underline;
+  border-bottom: 2px solid var(--primary-disabled);
 }
 
 .navbar__menu-icon {

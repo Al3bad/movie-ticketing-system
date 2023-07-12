@@ -6,6 +6,7 @@
   --font-size: 14px;
   --primary: rgba(52, 96, 197, 1);
   --primary-dark: rgba(41, 82, 176, 1);
+  --primary-disabled: rgba(160, 182, 231, 1);
   --secondary: rgba(249, 250, 252, 1);
   --red: rgba(228, 0, 0, 1);
   --green: rgba(10, 183, 48, 1);
