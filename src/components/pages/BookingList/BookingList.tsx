@@ -43,12 +43,7 @@ const BookingList = () => {
 
   return (
     <>
-      <Table
-        headers={table_headers}
-        values={bookings}
-        id="id"
-        path="/bookings"
-      ></Table>
+      <Table headers={table_headers} values={bookings} id="id"></Table>
     </>
   );
 };

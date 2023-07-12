@@ -7,32 +7,32 @@ import Icon from "../Icon/Icon";
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "dashboard",
     icon: "dashboard",
   },
   {
     title: "Purchase Ticket",
-    url: "/",
+    url: "",
     icon: "cart",
   },
   {
     title: "Customer",
-    url: "/customers",
+    url: "customers",
     icon: "customer",
   },
   {
     title: "Tickets",
-    url: "/tickets",
+    url: "tickets",
     icon: "ticket",
   },
   {
     title: "Movies",
-    url: "/movies",
+    url: "movies",
     icon: "movie",
   },
   {
     title: "Bookings",
-    url: "/bookings",
+    url: "bookings",
     icon: "clock",
   },
 ];

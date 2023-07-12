@@ -13,7 +13,6 @@ type TableProps = {
   // key of the value that will be used to navigate to Detail pages
   // e.g: customerDetail: email, movie: title, booking: id,...
   id: any;
-  path: string;
 };
 
 const Table: React.FC<TableProps> = (props) => {
@@ -75,11 +74,10 @@ const Table: React.FC<TableProps> = (props) => {
             return (
               <tr key={value[props.id]} className={styles.table__content}>
                 {headerValues.map((header, header_id: number) => {
+                  console.log("id ", value[props.id]);
                   return (
                     <td key={header_id}>
-                      <Link to={`${props.path}/${value[props.id]}`}>
-                        {value[header.key]}
-                      </Link>
+                      <Link to={`${value[props.id]}`}>{value[header.key]}</Link>
                     </td>
                   );
                 })}
