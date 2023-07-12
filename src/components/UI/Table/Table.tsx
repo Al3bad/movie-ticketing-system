@@ -13,6 +13,7 @@ type TableProps = {
   // key of the value that will be used to navigate to Detail pages
   // e.g: customerDetail: email, movie: title, booking: id,...
   id: any;
+  path: string;
 };
 
 const Table: React.FC<TableProps> = (props) => {
@@ -64,20 +65,20 @@ const Table: React.FC<TableProps> = (props) => {
       <table className={styles.table}>
         <thead>
           <tr className={styles.table__header}>
-            {headerValues.map((header) => (
-              <th key={header.key}>{header.title}</th>
+            {headerValues.map((header, id) => (
+              <th key={id}>{header.title}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {props.values.map((value) => {
+          {props.values.map((value, id) => {
             return (
-              <tr key={value[props.id]} className={styles.table__content}>
-                {headerValues.map((header, header_id: number) => {
-                  console.log("id ", value[props.id]);
+              <tr key={id} className={styles.table__content}>
+                {headerValues.map((header, id) => {
+                  const url = encodeURI(`/${props.path}?id=${value[props.id]}`);
                   return (
-                    <td key={header_id}>
-                      <Link to={`${value[props.id]}`}>{value[header.key]}</Link>
+                    <td key={id}>
+                      <Link to={url}>{value[header.key]}</Link>
                     </td>
                   );
                 })}

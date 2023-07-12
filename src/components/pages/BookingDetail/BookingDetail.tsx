@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { fetchBookingById } from "../../../utils/http-requests";
 import styles from "./BookingDetail.module.css";
 
 const BookingDetail = () => {
   const [bookingDetail, setBookingDetail] = useState();
-  const params = useParams();
+  const params = useLocation();
 
   useEffect(() => {
-    fetchBookingDetailHandler();
+    const queryParams = new URLSearchParams(params.search);
+    const bookingId = queryParams.get("id");
+    if (bookingId) {
+      fetchBookingDetailHandler(+bookingId);
+    }
   }, []);
 
-  const fetchBookingDetailHandler = async () => {
-    const booking = await fetchBookingById(params.id);
+  const fetchBookingDetailHandler = async (bookingId: number) => {
+    const booking = await fetchBookingById(bookingId);
     if (booking) {
       setBookingDetail(booking);
     }

@@ -4,13 +4,23 @@ import styles from "./Input.module.css";
 type InputProps = {
   label: string;
   classLabel?: string;
-  onInputChange: (name: string, val: string | number) => void;
+  isDisabled?: boolean;
+  type?: string;
+  value?: any;
+  onChange: (name: string, val: string | number) => void;
 };
 
-const Input: React.FC<InputProps> = ({label, classLabel, onInputChange,...inputAttr}) => {
+const Input: React.FC<InputProps> = ({
+  label,
+  classLabel,
+  isDisabled = false,
+  type = "text",
+  value,
+  onChange,
+}) => {
   const inputChangeHandler = (e) => {
-    onInputChange(label, e.target.value);
-  }
+    onChange(label, e.target.value);
+  };
   return (
     <div
       className={`${styles["input-field"]} ${
@@ -18,7 +28,12 @@ const Input: React.FC<InputProps> = ({label, classLabel, onInputChange,...inputA
       }`}
     >
       {!classLabel?.includes("multi-inputs") && <label>{label}</label>}
-      <input {...inputAttr} onChange={inputChangeHandler} />
+      <input
+        type={type}
+        onChange={inputChangeHandler}
+        disabled={isDisabled}
+        value={value}
+      />
     </div>
   );
 };
