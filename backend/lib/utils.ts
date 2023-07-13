@@ -77,7 +77,7 @@ export const formatBooking = (
   }[]
 ) => {
   if (booking.length === 0) return [];
-  const booking_fee = 2;
+  const bookingFee = 2;
   const {
     id,
     email,
@@ -90,7 +90,7 @@ export const formatBooking = (
   } = booking[0];
   const formattedBooking: {
     id: number;
-    booking_fee: number;
+    bookingFee: number;
     totalTicketPrice: number;
     customer: Modify<
       NormalCustomer,
@@ -104,7 +104,7 @@ export const formatBooking = (
     tickets: Ticket[];
   } = {
     id: id,
-    booking_fee,
+    bookingFee,
     totalTicketPrice,
     customer: {
       email: email,
