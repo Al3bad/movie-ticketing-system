@@ -610,20 +610,7 @@ export class DB {
         `SELECT b.id, c.*,
                 b.movieTitle AS title, b.discountRate, b.threshold,
                 pt.ticketType, pt.ticketPrice, pt.qty,
-                tc.component, tc.qty AS componentTicketQty,
-                (SELECT SUM(pt.ticketPrice * pt.qty) as total
-                  FROM booking b
-                  JOIN customer c
-                      ON b.customerEmail = c.email
-                  JOIN purchasedTicket pt
-                      ON b.id = pt.bookingId
-                  -- Get components of group tickets (if any)
-                  LEFT JOIN ticketComponent tc
-                      ON pt.ticketType = tc.type
-                  -- Get price of single tickets
-                  LEFT JOIN ticket singleTicket
-                      on pt.ticketType = singleTicket.type
-                  WHERE b.id = 2) AS totalTicketPrice
+                tc.component, tc.qty AS componentTicketQty
           FROM booking b
           JOIN customer c
               ON b.customerEmail = c.email
@@ -658,7 +645,7 @@ export class DB {
                   -- Get price of single tickets
                   LEFT JOIN ticket singleTicket
                       on pt.ticketType = singleTicket.type
-                  WHERE b.id = 2) AS totalTicketPrice
+                  WHERE b.id = @id) AS totalTicketPrice
           FROM booking b
           JOIN customer c
               ON b.customerEmail = c.email
@@ -670,9 +657,9 @@ export class DB {
           -- Get price of single tickets
           LEFT JOIN ticket singleTicket
               on pt.ticketType = singleTicket.type
-          WHERE b.id = ?`
+          WHERE b.id = @id`
       )
-      .all(z.number().positive().int().or(z.bigint()).parse(id));
+      .all({ id: z.number().positive().int().or(z.bigint()).parse(id) });
   };
 }
 
