@@ -217,8 +217,9 @@ const PurchaseTickets = () => {
           <MultipleInputs
             label="Customer Email"
             type="input-w-btn"
-            onButtonClick={fetchCustomerHandler}
-            onInputChange={inputChangeHandler}
+            id="customer-email"
+            onClick={fetchCustomerHandler}
+            onChange={inputChangeHandler}
           />
 
           {/* Display Customer name and type only when customer info is fetched */}
@@ -232,7 +233,8 @@ const PurchaseTickets = () => {
               <Input
                 label="Customer Name"
                 type="text"
-                onInputChange={inputChangeHandler}
+                id="customer-name"
+                onChange={inputChangeHandler}
               />
 
               {/* 
@@ -243,8 +245,9 @@ const PurchaseTickets = () => {
               */}
               <Dropdown
                 label="Customer Type"
+                id="customer-type"
                 options={DUMMY_CUSTOMER_TYPES}
-                onInputChange={inputChangeHandler}
+                onChange={inputChangeHandler}
               />
             </>
           )}
@@ -256,8 +259,9 @@ const PurchaseTickets = () => {
           */}
           <Dropdown
             label="Movie"
+            id="movie"
             options={data.movies}
-            onInputChange={inputChangeHandler}
+            onChange={inputChangeHandler}
           />
 
           <p>Tickets</p>
@@ -266,10 +270,11 @@ const PurchaseTickets = () => {
             <MultipleInputs
               key={id}
               label="Tickets"
+              id="tickets"
               hide_label={true}
               options={data.ticketTypes}
               type="dropdown-w-input"
-              onInputChange={(label: string, val: string) =>
+              onChange={(label: string, val: string) =>
                 inputChangeHandler(label, val, id)
               }
             />
@@ -277,9 +282,9 @@ const PurchaseTickets = () => {
 
           <Button
             type="button"
-            label="Add New Ticket"
+            id="add-new-ticket"
             classLabels={["secondary", "secondary--icon"]}
-            onButtonClick={addNewTicketsHandler}
+            onClick={addNewTicketsHandler}
           >
             <Icon name="add" />
           </Button>

@@ -7,12 +7,12 @@ import Icon from "../Icon/Icon";
 const menuItems = [
   {
     title: "Dashboard",
-    url: "dashboard",
+    url: "",
     icon: "dashboard",
   },
   {
     title: "Purchase Ticket",
-    url: "",
+    url: "purchase-tickets",
     icon: "cart",
   },
   {

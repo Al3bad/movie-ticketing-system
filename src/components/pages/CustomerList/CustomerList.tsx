@@ -26,6 +26,13 @@ const CustomerList = () => {
       setCustomers(customerList);
     }
   };
-  return <Table headers={table_headers} values={customers}></Table>;
+  return (
+    <Table
+      headers={table_headers}
+      values={customers}
+      id="email"
+      path="customer"
+    ></Table>
+  );
 };
 export default CustomerList;

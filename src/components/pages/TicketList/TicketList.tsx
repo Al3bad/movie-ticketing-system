@@ -23,7 +23,14 @@ const TicketList = () => {
       setTickets(ticketList);
     }
   };
-  return <Table headers={table_headers} values={tickets}></Table>;
+  return (
+    <Table
+      headers={table_headers}
+      values={tickets}
+      path="ticket"
+      id="type"
+    ></Table>
+  );
 };
 
 export default TicketList;
