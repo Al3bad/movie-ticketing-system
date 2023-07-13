@@ -87,6 +87,15 @@ export const fetchTickets = async () => {
   }
 };
 
+export const fetchTicketByType = async (type: string) => {
+  const tickets_endpoint = `${BASE_API_ENDPOINT}/ticket/${type}`;
+  try {
+    const response = await fetch(tickets_endpoint);
+    return response.json();
+  } catch (err) {
+    console.log(err);
+  }
+};
 export const fetchBookings = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/booking/`;
   try {
