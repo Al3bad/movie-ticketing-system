@@ -73,20 +73,39 @@ export const formatBooking = (
     qty: number;
     component: string | null;
     componentTicketQty: number | null;
+    totalTicketPrice: number;
   }[]
 ) => {
   if (booking.length === 0) return [];
-  const { id, email, name, type, title, discountRate, threshold } = booking[0];
+  const bookingFee = 2;
+  const {
+    id,
+    email,
+    name,
+    type,
+    title,
+    discountRate,
+    threshold,
+    totalTicketPrice,
+  } = booking[0];
   const formattedBooking: {
     id: number;
+    bookingFee: number;
+    totalTicketPrice: number;
     customer: Modify<
       NormalCustomer,
-      { type: CustomerType; discountRate?: number; threshold?: number }
+      {
+        type: CustomerType;
+        discountRate?: number;
+        threshold?: number;
+      }
     >;
     title: string;
     tickets: Ticket[];
   } = {
     id: id,
+    bookingFee,
+    totalTicketPrice,
     customer: {
       email: email,
       name: name,

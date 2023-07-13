@@ -32,8 +32,6 @@
 |   ✅   | GET /api/ticket/         | Get all ticket types                 |
 |   ✅   | GET /api/ticket/:type    | Get ticket type                      |
 
----
-
 # TODO
 
 - [ ] Improve format of the error responses
