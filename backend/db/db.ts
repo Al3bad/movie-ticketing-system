@@ -608,9 +608,10 @@ export class DB {
     return this.connection
       .prepare(
         `SELECT b.id, c.*,
-                b.movieTitle AS title, b.discountRate, b.threshold,
-                pt.ticketType, pt.ticketPrice, pt.qty,
-                tc.component, tc.qty AS componentTicketQty
+                b.movieTitle AS title,
+                pt.ticketType, pt.ticketprice, pt.qty,
+                tc.component, tc.qty AS componentTicketQty,
+                total.total AS totalTicketPrice
           FROM booking b
           JOIN customer c
               ON b.customerEmail = c.email
@@ -621,7 +622,21 @@ export class DB {
               ON pt.ticketType = tc.type
           -- Get price of single tickets
           LEFT JOIN ticket singleTicket
-              on pt.ticketType = singleTicket.type`
+              on pt.ticketType = singleTicket.type
+          LEFT JOIN (SELECT b.id, SUM(pt.ticketPrice * pt.qty) as total
+                      FROM booking b
+                      JOIN customer c
+                          ON b.customerEmail = c.email
+                      JOIN purchasedTicket pt
+                          ON b.id = pt.bookingId
+                      -- Get components of group tickets (if any)
+                      LEFT JOIN ticketComponent tc
+                          ON pt.ticketType = tc.type
+                      -- Get price of single tickets
+                      LEFT JOIN ticket singleTicket
+                          ON pt.ticketType = singleTicket.type
+                      GROUP BY b.id) total
+              ON b.id = total.id`
       )
       .all();
   };
