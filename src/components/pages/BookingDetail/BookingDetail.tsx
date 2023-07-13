@@ -55,7 +55,7 @@ const BookingDetail = () => {
           return (
             <div key={id}>
               {printBookingKeyValue("Ticket Type", ticket.type)}
-              {printBookingKeyValue("Ticket Unit Price", "$$$$$")}
+              {printBookingKeyValue("Ticket Unit Price", `$${ticket.price}`)}
               {printBookingKeyValue("Ticket Quantity", ticket.qty)}
               {id < bookingDetail.tickets.length - 1
                 ? printDivider("short")
@@ -65,8 +65,11 @@ const BookingDetail = () => {
         })}
         {printDivider()}
         {printBookingKeyValue("Discount", bookingDetail.customer.discountRate)}
-        {printBookingKeyValue("Booking Fee", "$$$$$")}
-        {printBookingKeyValue("Total Cost", "$$$$$")}
+        {printBookingKeyValue("Booking Fee", bookingDetail.bookingFee)}
+        {printBookingKeyValue(
+          "Total Cost",
+          `$${bookingDetail.totalTicketPrice}`
+        )}
       </div>
     );
   } else {

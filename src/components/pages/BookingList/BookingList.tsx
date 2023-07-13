@@ -7,7 +7,7 @@ const table_headers = [
   { title: "Name", key: "name" },
   { title: "Movie", key: "movie" },
   { title: "Email", key: "email" },
-  { title: "Ticket Qty", key: "qty" },
+  { title: "Total", key: "totalTicketPrice" },
 ];
 
 const BookingList = () => {
@@ -20,25 +20,17 @@ const BookingList = () => {
   const fetchBookingHandler = async () => {
     const bookingList = await fetchBookings();
     if (bookingList) {
-      const bookingValues = bookingList.map((booking: Booking) => {
+      const bookingValues = bookingList.map((booking) => {
         return {
           id: booking.id,
           email: booking.customer.email,
           name: booking.customer.name,
           movie: booking.title,
-          qty: getTicketQty(booking),
+          totalTicketPrice: `$${booking.totalTicketPrice}`,
         };
       });
       setBookings(bookingValues);
     }
-  };
-
-  const getTicketQty = (booking: Booking) => {
-    const ticketQties = booking.tickets.map((ticket) => ticket.qty);
-    const sumTicketQty = ticketQties.reduce(
-      (sum: number, qty: number) => sum + qty
-    );
-    return sumTicketQty;
   };
 
   return (

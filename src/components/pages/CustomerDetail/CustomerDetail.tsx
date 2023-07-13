@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { fetchCustomerByEmail } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
+import Dropdown from "../../UI/Dropdown/Dropdown";
 import Button from "../../UI/Button/Button";
 
 const inputFields = [
@@ -29,6 +30,21 @@ const inputFields = [
     label: "Threshold",
     type: "number",
     key: "threshold",
+  },
+];
+
+const CUSTOMER_TYPES = [
+  {
+    id: 1,
+    value: "Normal",
+  },
+  {
+    id: 2,
+    value: "Flat",
+  },
+  {
+    id: 3,
+    value: "Step",
   },
 ];
 
@@ -70,19 +86,33 @@ const CustomerDetail = () => {
   return (
     <>
       <form>
-        {inputFields.map((field, id) => (
-          <Input
-            key={id}
-            isDisabled={!isEdit}
-            label={field.label}
-            type={field.type}
-            onChange={inputChangeHandler}
-            value={customer[field.key]}
-          />
-        ))}
+        {inputFields.map((field, id) => {
+          if (field.label === "Customer Type") {
+            return (
+              <Dropdown
+                key={id}
+                label={field.label}
+                options={CUSTOMER_TYPES}
+                isDisabled={!isEdit}
+                value={customer[field.key]}
+              />
+            );
+          } else {
+            return (
+              <Input
+                key={id}
+                isDisabled={!isEdit}
+                label={field.label}
+                type={field.type}
+                onChange={inputChangeHandler}
+                value={customer[field.key]}
+              />
+            );
+          }
+        })}
         <Button
           label="Edit"
-          type="submit"
+          type="button"
           onClick={editCustomerHandler}
           classLabels={["primary"]}
         />

@@ -4,22 +4,26 @@ import styles from "./Dropdown.module.css";
 type Option = {
   id: string | number;
   value: string;
-}
+};
 type DropdownProps = {
   label: string;
   classLabel?: string;
   options: Option[];
-  onInputChange: (name: string, val: string | number) => void;
+  isDisabled?: boolean;
+  value?: string;
+  onChange: (name: string, val: string | number) => void;
 };
 
 const Dropdown: React.FC<DropdownProps> = ({
   label,
   classLabel,
   options,
-  onInputChange,
+  isDisabled = false,
+  value = undefined,
+  onChange,
 }) => {
   const dropdownHandler = (e) => {
-    onInputChange(label, e.target.value);
+    onChange(label, e.target.value);
   };
   return (
     <div
@@ -28,7 +32,12 @@ const Dropdown: React.FC<DropdownProps> = ({
       }`}
     >
       {!classLabel?.includes("multi-inputs") && <label>{label}</label>}
-      <select onChange={dropdownHandler} defaultValue={"DEFAULT"}>
+      <select
+        onChange={dropdownHandler}
+        defaultValue={"DEFAULT"}
+        disabled={isDisabled}
+        value={value}
+      >
         <option value="DEFAULT" disabled>
           Select an option...
         </option>
