@@ -77,6 +77,16 @@ export const fetchMovies = async () => {
   }
 };
 
+export const fetchMovieByTitle = async (title: string) => {
+  const movies_endpoint = `${BASE_API_ENDPOINT}/movie/${title}`;
+  try {
+    const response = await httpFetch(movies_endpoint);
+    return response.json();
+  } catch (err) {
+    errorHandler(err);
+  }
+};
+
 export const fetchTickets = async () => {
   const tickets_endpoint = `${BASE_API_ENDPOINT}/ticket/`;
   try {
