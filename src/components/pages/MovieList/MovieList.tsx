@@ -23,7 +23,14 @@ const MovieList = () => {
       setMovies(movieList);
     }
   };
-  return <Table headers={table_headers} values={movies}></Table>;
+  return (
+    <Table
+      headers={table_headers}
+      values={movies}
+      path="movie"
+      id="title"
+    ></Table>
+  );
 };
 
 export default MovieList;
