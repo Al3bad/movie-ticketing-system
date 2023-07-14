@@ -494,7 +494,6 @@ export class DB {
     // NOTE: as of now, customer cannot update their type
     const email = z.string().email().parse(customerEmail);
     const newInfo = UpdateCustomerSchema.parse(newCustoemrInfo);
-
     // update the remaining details
     const info = this.connection
       .prepare(

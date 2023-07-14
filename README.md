@@ -2,6 +2,21 @@
 
 ...
 
+## Features:
+
+- Create new customer from "/customer" page
+- Create new movie from "/movie" page
+- Create new ticket type from "/type" page
+- Create new booking from "/purchase-tickets" page
+- Edit discount rate, threshold, name ane email of the customer
+- Edit title and isReleased for a movie
+- Display list of customers/movies/ticket types/bookings
+- Dashboard
+- Filter customers by name
+- Filter movies by title
+- Filter tickets by type
+- Filter bookings by id
+
 # Commands
 
 | CMD                | Description                                     |
