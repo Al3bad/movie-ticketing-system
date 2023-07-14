@@ -16,7 +16,7 @@ const menuItems = [
     icon: "cart",
   },
   {
-    title: "Customer",
+    title: "Customers",
     url: "customers",
     icon: "customer",
   },
