@@ -6,12 +6,12 @@ import Button from "../../UI/Button/Button";
 
 const inputFields = [
   {
-    title: "Title",
+    label: "Movie Title",
     key: "title",
     type: "text",
   },
   {
-    title: "Seat Available",
+    label: "Seat Available",
     key: "seatAvailable",
     type: "number",
   },
@@ -61,12 +61,12 @@ const MovieDetail = () => {
               />
             );
           })}
-          <Button
+          {/* <Button
             label={!isEdit ? "Edit" : "Save"}
             type="button"
             onClick={editMovieHandler}
             classLabels={["primary"]}
-          />
+          /> */}
         </form>
       )}
     </>

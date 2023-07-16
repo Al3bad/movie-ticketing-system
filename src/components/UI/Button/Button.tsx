@@ -14,9 +14,9 @@ const Button: React.FC<ButtonProps> = (props) => {
     .map((label) => styles[`button--${label}`])
     .join(" ");
 
-  const buttonClickHandler = () => {
+  const buttonClickHandler = (e) => {
     if (props.onClick) {
-      props.onClick(props.label);
+      props.onClick(props.label, e);
     }
   };
 
