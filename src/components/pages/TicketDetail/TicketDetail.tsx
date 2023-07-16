@@ -31,7 +31,6 @@ const TicketDetail = () => {
 
   const fetchTicketTypeHandler = async (type: string) => {
     const ticket = await fetchTicketByType(type);
-    console.log(ticket);
     setTicket(ticket);
   };
 

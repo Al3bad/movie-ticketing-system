@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import { fetchCustomers } from "../../../utils/http-requests";
 import Table from "../../UI/Table/Table";
 
@@ -14,18 +14,7 @@ const table_headers = [
 ];
 
 const CustomerList = () => {
-  const [customers, setCustomers] = useState([]);
-
-  useEffect(() => {
-    fetchCustomerHandler();
-  }, []);
-
-  const fetchCustomerHandler = async () => {
-    const customerList = await fetchCustomers();
-    if (customerList) {
-      setCustomers(customerList);
-    }
-  };
+  const customers = useLoaderData();
   return (
     <Table
       headers={table_headers}
@@ -36,3 +25,10 @@ const CustomerList = () => {
   );
 };
 export default CustomerList;
+
+export const customerListLoader = async () => {
+  const customerList = await fetchCustomers();
+  if (customerList) {
+    return customerList;
+  }
+};
