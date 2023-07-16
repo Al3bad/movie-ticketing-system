@@ -10,6 +10,7 @@
 
 .container__content {
   margin-top: 100px;
+  text-align: center;
 }
 
 @media (min-width: 760px) {
