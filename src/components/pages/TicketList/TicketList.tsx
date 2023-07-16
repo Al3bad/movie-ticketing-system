@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { fetchTickets } from "../../../utils/http-requests";
+import { useLoaderData } from "react-router-dom";
 import Table from "../../UI/Table/Table";
 
 const table_headers = [
@@ -11,18 +11,7 @@ const table_headers = [
 ];
 
 const TicketList = () => {
-  const [tickets, setTickets] = useState([]);
-
-  useEffect(() => {
-    fetchTicketHandler();
-  }, []);
-
-  const fetchTicketHandler = async () => {
-    const ticketList = await fetchTickets();
-    if (ticketList) {
-      setTickets(ticketList);
-    }
-  };
+  const tickets = useLoaderData();
   return (
     <Table
       headers={table_headers}
@@ -34,3 +23,10 @@ const TicketList = () => {
 };
 
 export default TicketList;
+
+export const ticketListLoader = async () => {
+  const ticketList = await fetchTickets();
+  if (ticketList) {
+    return ticketList;
+  }
+};

@@ -1,17 +1,25 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import PurchaseTickets from "./components/pages/PurchaseTickets/PurchaseTickets";
-import TicketList from "./components/pages/TicketList/TicketList";
-import BookingList from "./components/pages/BookingList/BookingList";
+import TicketList, {
+  ticketListLoader,
+} from "./components/pages/TicketList/TicketList";
+import BookingList, {
+  bookingListLoader,
+} from "./components/pages/BookingList/BookingList";
 import BookingDetail from "./components/pages/BookingDetail/BookingDetail";
-import CustomerList from "./components/pages/CustomerList/CustomerList";
+import CustomerList, {
+  customerListLoader,
+} from "./components/pages/CustomerList/CustomerList";
 import CustomerDetail from "./components/pages/CustomerDetail/CustomerDetail";
 import TicketDetail from "./components/pages/TicketDetail/TicketDetail";
-import MovieList from "./components/pages/MovieList/MovieList";
+import MovieList, {
+  movieListLoader,
+} from "./components/pages/MovieList/MovieList";
 import MovieDetail from "./components/pages/MovieDetail/MovieDetail";
 import Layout from "./components/UI/Layout/Layout";
 import Dashboard from "./components/pages/Dashboard/Dashboard";
-import PageNotFound from "./components/pages/PageNotFound/PageNotFound";
+import Error from "./components/pages/Error/Error";
 
 import "./App.css";
 
@@ -19,14 +27,18 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout title="" />,
-    errorElement: <PageNotFound />,
+    errorElement: <Error />,
     children: [
       { index: true, element: <Dashboard /> },
       { path: "purchase-tickets", element: <PurchaseTickets /> },
-      { path: "customers", element: <CustomerList /> },
-      { path: "tickets", element: <TicketList /> },
-      { path: "movies", element: <MovieList /> },
-      { path: "bookings", element: <BookingList /> },
+      {
+        path: "customers",
+        element: <CustomerList />,
+        loader: customerListLoader,
+      },
+      { path: "tickets", element: <TicketList />, loader: ticketListLoader },
+      { path: "movies", element: <MovieList />, loader: movieListLoader },
+      { path: "bookings", element: <BookingList />, loader: bookingListLoader },
       { path: "customer", element: <CustomerDetail /> },
       { path: "ticket", element: <TicketDetail /> },
       { path: "movie", element: <MovieDetail /> },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import { fetchMovies } from "../../../utils/http-requests";
 import Table from "../../UI/Table/Table";
 
@@ -11,18 +11,8 @@ const table_headers = [
 ];
 
 const MovieList = () => {
-  const [movies, setMovies] = useState([]);
+  const movies = useLoaderData();
 
-  useEffect(() => {
-    fetchMovieHandler();
-  }, []);
-
-  const fetchMovieHandler = async () => {
-    const movieList = await fetchMovies();
-    if (movieList) {
-      setMovies(movieList);
-    }
-  };
   return (
     <Table
       headers={table_headers}
@@ -34,3 +24,10 @@ const MovieList = () => {
 };
 
 export default MovieList;
+
+export const movieListLoader = async () => {
+  const movieList = await fetchMovies();
+  if (movieList) {
+    return movieList;
+  }
+};

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import { fetchBookings } from "../../../utils/http-requests";
 import Table from "../../UI/Table/Table";
 
@@ -11,28 +11,7 @@ const table_headers = [
 ];
 
 const BookingList = () => {
-  const [bookings, setBookings] = useState([]);
-
-  useEffect(() => {
-    fetchBookingHandler();
-  }, []);
-
-  const fetchBookingHandler = async () => {
-    const bookingList = await fetchBookings();
-    if (bookingList) {
-      const bookingValues = bookingList.map((booking) => {
-        return {
-          id: booking.id,
-          email: booking.customer.email,
-          name: booking.customer.name,
-          movie: booking.title,
-          totalTicketPrice: `$${booking.totalTicketPrice}`,
-        };
-      });
-      setBookings(bookingValues);
-    }
-  };
-
+  const bookings = useLoaderData();
   return (
     <>
       <Table
@@ -46,3 +25,19 @@ const BookingList = () => {
 };
 
 export default BookingList;
+
+export const bookingListLoader = async () => {
+  const bookingList = await fetchBookings();
+  if (bookingList) {
+    const bookingValues = bookingList.map((booking) => {
+      return {
+        id: booking.id,
+        email: booking.customer.email,
+        name: booking.customer.name,
+        movie: booking.title,
+        totalTicketPrice: `$${booking.totalTicketPrice}`,
+      };
+    });
+    return bookingValues;
+  }
+};

@@ -1,7 +1,7 @@
 import NavBar from "../../UI/NavBar/NavBar";
-import styles from "./PageNotFound.module.css";
+import styles from "./Error.module.css";
 
-const PageNotFound = () => {
+const Error = () => {
   return (
     <div className={styles.container}>
       <NavBar className={styles.container__navbar} />
@@ -13,4 +13,4 @@ const PageNotFound = () => {
   );
 };
 
-export default PageNotFound;
+export default Error;
