@@ -20,24 +20,38 @@ class ResponseError extends Error {
 
 const errorHandler = (err) => {
   if (err.response && err.response.status) {
+    const response = { status: err.response.status };
     switch (err.response.status) {
       case 400:
-        console.log("Bad Request");
-        break;
+        throw {
+          ...response,
+          message: "Bad Request",
+        };
       case 401:
-        console.log("Unauthorized");
-        break;
+        throw {
+          ...response,
+          message: "Unauthorized",
+        };
       case 404:
-        console.log("Page Not Found");
-        break;
+        throw {
+          ...response,
+          message: "Page Not Found",
+        };
       case 500:
-        console.log("Internal Server Error");
-        break;
+        throw {
+          ...response,
+          message: "Internal Server Error",
+        };
       default:
-        console.log("other handled errors", err);
+        throw {
+          ...response,
+          message: "Fail to load data",
+        };
     }
   } else {
-    console.log(err);
+    throw {
+      message: "An error occurred",
+    };
   }
 };
 
