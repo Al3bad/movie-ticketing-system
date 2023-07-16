@@ -19,6 +19,7 @@ const Input: React.FC<InputProps> = ({
   onChange,
 }) => {
   const inputChangeHandler = (e) => {
+    //console.log(e.target.value);
     onChange(label, e.target.value);
   };
   return (

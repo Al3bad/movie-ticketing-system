@@ -17,14 +17,9 @@ const inputFields = [
   },
 ];
 
-const initialData = {
-  type: "",
-  price: 0,
-};
-
 const TicketDetail = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const [ticket, setTicket] = useState(initialData);
+  const [ticket, setTicket] = useState();
   const location = useLocation();
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -44,31 +39,33 @@ const TicketDetail = () => {
     console.log(val);
   };
 
-  const editCustomerHandler = () => {
+  const editTicketHandler = () => {
     setIsEdit((currentVal) => !currentVal);
   };
   return (
     <>
-      <form>
-        {inputFields.map((field, id) => {
-          return (
-            <Input
-              key={id}
-              isDisabled={field.key === "type" ? true : !isEdit}
-              label={field.label}
-              type={field.type}
-              onChange={inputChangeHandler}
-              value={ticket[field.key]}
-            />
-          );
-        })}
-        <Button
-          label="Edit"
-          type="button"
-          onClick={editCustomerHandler}
-          classLabels={["primary"]}
-        />
-      </form>
+      {ticket && (
+        <form>
+          {inputFields.map((field, id) => {
+            return (
+              <Input
+                key={id}
+                isDisabled={field.key === "type" ? true : !isEdit}
+                label={field.label}
+                type={field.type}
+                onChange={inputChangeHandler}
+                value={ticket[field.key]}
+              />
+            );
+          })}
+          {/* <Button
+            label="Edit"
+            type="button"
+            onClick={editTicketHandler}
+            classLabels={["primary"]}
+          /> */}
+        </form>
+      )}
     </>
   );
 };

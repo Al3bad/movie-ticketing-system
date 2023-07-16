@@ -1,10 +1,13 @@
 import { BASE_API_ENDPOINT } from "./constants";
 
-const post_header = {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
+const getHTTPHeader = (method: string) => {
+  const header = {
+    method: method.toUpperCase(),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  return header;
 };
 
 // create custom ResponseError
@@ -61,6 +64,21 @@ export const fetchCustomers = async () => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/`;
   try {
     const response = await httpFetch(customer_endpoint);
+    return response.json();
+  } catch (err) {
+    errorHandler(err);
+  }
+};
+
+export const updateCustomer = async (email: string, updatedInfo) => {
+  const customer_endpoint = `${BASE_API_ENDPOINT}/customer/${email}`;
+  try {
+    const data = {
+      ...getHTTPHeader("put"),
+      body: JSON.stringify(updatedInfo),
+    };
+    console.log(data);
+    const response = await httpFetch(customer_endpoint, data);
     return response.json();
   } catch (err) {
     errorHandler(err);
@@ -130,7 +148,7 @@ export const submitBooking = async (data) => {
   const purchase_ticket_endpoint = `${BASE_API_ENDPOINT}/booking`;
   try {
     const response = await fetch(purchase_ticket_endpoint, {
-      ...post_header,
+      ...getHTTPHeader("post"),
       body: JSON.stringify(data),
     });
     return response.json();
