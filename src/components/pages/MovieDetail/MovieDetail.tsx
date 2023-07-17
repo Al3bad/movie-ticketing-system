@@ -65,8 +65,6 @@ export const movieDetailLoader = async ({ request }) => {
   const title = url.searchParams.get("id");
   if (title) {
     const fetchedMovie = await fetchMovieByTitle(title);
-    if (fetchedMovie) {
-      return fetchedMovie;
-    }
+    return fetchedMovie;
   }
 };
