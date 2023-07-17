@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 import { fetchTicketByType } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
 import Button from "../../UI/Button/Button";
@@ -19,20 +19,7 @@ const inputFields = [
 
 const TicketDetail = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const [ticket, setTicket] = useState();
-  const location = useLocation();
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const ticketType = queryParams.get("id");
-    if (ticketType) {
-      fetchTicketTypeHandler(ticketType);
-    }
-  }, []);
-
-  const fetchTicketTypeHandler = async (type: string) => {
-    const ticket = await fetchTicketByType(type);
-    setTicket(ticket);
-  };
+  const ticket = useLoaderData();
 
   const inputChangeHandler = (val) => {
     console.log(val);
@@ -70,3 +57,12 @@ const TicketDetail = () => {
 };
 
 export default TicketDetail;
+
+export const ticketDetailLoader = async ({ request }) => {
+  const url = new URL(request.url);
+  const ticketType = url.searchParams.get("id");
+  if (ticketType) {
+    const ticket = await fetchTicketByType(ticketType);
+    return ticket;
+  }
+};

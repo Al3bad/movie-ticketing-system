@@ -12,7 +12,9 @@ import CustomerList, {
   customerListLoader,
 } from "./components/pages/CustomerList/CustomerList";
 import CustomerDetail from "./components/pages/CustomerDetail/CustomerDetail";
-import TicketDetail from "./components/pages/TicketDetail/TicketDetail";
+import TicketDetail, {
+  ticketDetailLoader,
+} from "./components/pages/TicketDetail/TicketDetail";
 import MovieList, {
   movieListLoader,
 } from "./components/pages/MovieList/MovieList";
@@ -39,8 +41,11 @@ const router = createBrowserRouter([
       { path: "tickets", element: <TicketList />, loader: ticketListLoader },
       { path: "movies", element: <MovieList />, loader: movieListLoader },
       { path: "bookings", element: <BookingList />, loader: bookingListLoader },
-      { path: "customer", element: <CustomerDetail /> },
-      { path: "ticket", element: <TicketDetail /> },
+      {
+        path: "customer",
+        element: <CustomerDetail />,
+      },
+      { path: "ticket", element: <TicketDetail />, loader: ticketDetailLoader },
       { path: "movie", element: <MovieDetail /> },
       { path: "booking", element: <BookingDetail /> },
     ],
