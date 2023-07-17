@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 import {
   fetchCustomerByEmail,
   updateCustomer,
@@ -37,22 +37,7 @@ const inputFields = [
 
 const CustomerDetail = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const [customer, setCustomer] = useState();
-  const location = useLocation();
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const userEmail = queryParams.get("id");
-    if (userEmail) {
-      fetchCustomerHandler(userEmail);
-    }
-  }, []);
-
-  const fetchCustomerHandler = async (email: string) => {
-    const customer = await fetchCustomerByEmail(email);
-    console.log(customer);
-    setCustomer(customer);
-  };
+  const customer = useLoaderData();
 
   const updateCustomerHandler = async (email, data) => {
     const response = await updateCustomer(email, data);
@@ -61,9 +46,9 @@ const CustomerDetail = () => {
 
   const inputChangeHandler = (label, val) => {
     console.log(label, val);
-    setCustomer((currentInfo) => {
-      return { ...currentInfo, discountRate: +val };
-    });
+    // setCustomer((currentInfo) => {
+    //   return { ...currentInfo, discountRate: +val };
+    // });
   };
 
   const editCustomerHandler = (label, e) => {
@@ -108,3 +93,12 @@ const CustomerDetail = () => {
 };
 
 export default CustomerDetail;
+
+export const customerDetailLoader = async ({ request }) => {
+  const url = new URL(request.url);
+  const email = url.searchParams.get("id");
+  if (email) {
+    const customer = await fetchCustomerByEmail(email);
+    return customer;
+  }
+};
