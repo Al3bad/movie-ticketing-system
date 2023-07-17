@@ -18,7 +18,9 @@ import TicketDetail, {
 import MovieList, {
   movieListLoader,
 } from "./components/pages/MovieList/MovieList";
-import MovieDetail from "./components/pages/MovieDetail/MovieDetail";
+import MovieDetail, {
+  movieDetailLoader,
+} from "./components/pages/MovieDetail/MovieDetail";
 import Layout from "./components/UI/Layout/Layout";
 import Dashboard from "./components/pages/Dashboard/Dashboard";
 import Error from "./components/pages/Error/Error";
@@ -46,7 +48,7 @@ const router = createBrowserRouter([
         element: <CustomerDetail />,
       },
       { path: "ticket", element: <TicketDetail />, loader: ticketDetailLoader },
-      { path: "movie", element: <MovieDetail /> },
+      { path: "movie", element: <MovieDetail />, loader: movieDetailLoader },
       { path: "booking", element: <BookingDetail /> },
     ],
   },

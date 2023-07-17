@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 import { fetchMovieByTitle } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
 import Button from "../../UI/Button/Button";
@@ -18,23 +18,8 @@ const inputFields = [
 ];
 
 const MovieDetail = () => {
-  const [movie, setMovie] = useState();
+  const movie = useLoaderData();
   const [isEdit, setIsEdit] = useState(false);
-  const params = useLocation();
-  useEffect(() => {
-    const query = new URLSearchParams(params.search);
-    const title = query.get("id");
-    if (title) {
-      fetchMovieHandler(title);
-    }
-  }, []);
-
-  const fetchMovieHandler = async (title: string) => {
-    const fetchedMovie = await fetchMovieByTitle(title);
-    if (fetchedMovie) {
-      setMovie(fetchedMovie);
-    }
-  };
 
   const inputChangeHandler = (e) => {
     console.log(e);
@@ -74,3 +59,14 @@ const MovieDetail = () => {
 };
 
 export default MovieDetail;
+
+export const movieDetailLoader = async ({ request }) => {
+  const url = new URL(request.url);
+  const title = url.searchParams.get("id");
+  if (title) {
+    const fetchedMovie = await fetchMovieByTitle(title);
+    if (fetchedMovie) {
+      return fetchedMovie;
+    }
+  }
+};
