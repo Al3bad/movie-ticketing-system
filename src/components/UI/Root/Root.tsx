@@ -1,10 +1,10 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-import styles from "./Layout.module.css";
+import styles from "./Root.module.css";
 import NavBar from "../NavBar/NavBar";
 
-const Layout: React.FC<LayoutProps> = (props) => {
+const Root: React.FC<RootProps> = (props) => {
   return (
     <main className={styles.container}>
       <nav className={styles.container__navbar}>
@@ -20,4 +20,4 @@ const Layout: React.FC<LayoutProps> = (props) => {
   );
 };
 
-export default Layout;
+export default Root;
