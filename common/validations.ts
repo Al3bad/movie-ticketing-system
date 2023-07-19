@@ -26,8 +26,7 @@ export const NewMovieSchema = MovieSchema;
 
 export const UpdateMovieSchema = z.object({
   title: z.string().trim().nullish().default(null),
-  seatAvailable: SeatsAvailableSchema.nullish().default(null),
-  isReleased: z.boolean().nullish().default(null),
+  isReleased: z.coerce.number().nullish().default(null),
 });
 
 // ==============================================

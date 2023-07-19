@@ -319,7 +319,7 @@ export class DB {
     try {
       const info = this.connection
         .prepare(
-          "UPDATE movie SET title = IFNULL(@newTitle, title), seatAvailable = IFNULL(@seatAvailable, seatAvailable), isReleased = IFNULL(@isReleased, isReleased) WHERE title = @title"
+          "UPDATE movie SET title = IFNULL(@newTitle, title), isReleased = IFNULL(@isReleased, isReleased) WHERE title = @title"
         )
         .run({ ...newInfo, title, newTitle: newInfo.title });
       if (info.changes === 0) return undefined;

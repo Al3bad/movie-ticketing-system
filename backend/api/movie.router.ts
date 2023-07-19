@@ -58,7 +58,7 @@ const routes: Backend.Route[] = [
   {
     method: "put",
     endpoint: "/:title",
-    description: "Edit movie details",
+    description: "Edit movie details (title/isReleased)",
     parameters: [
       {
         name: "title",
@@ -73,11 +73,11 @@ const routes: Backend.Route[] = [
         type: "string",
         description: "New title of the specified movie",
       },
-      {
-        name: "seatAvailable",
-        type: "integer",
-        description: "New number of seats available",
-      },
+      // {
+      //   name: "seatAvailable",
+      //   type: "integer",
+      //   description: "New number of seats available",
+      // },
       {
         name: "isReleased",
         type: "boolean",
