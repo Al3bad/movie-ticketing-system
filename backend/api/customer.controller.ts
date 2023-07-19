@@ -12,10 +12,11 @@ import { NotFoundResourceError } from "backend/lib/errors";
 import { RunResult } from "better-sqlite3";
 
 export const getCustomers = (req: Request, res: Response) => {
-  const { page, limit } = PaginationOptsSchema.parse(req.query);
+  const { page, limit, filter } = PaginationOptsSchema.parse(req.query);
   const result = db.getCustomers({
     page: page || 1,
     limit: limit || 20,
+    filter: filter,
   });
   return res.status(httpStatus.OK).json(result);
 };

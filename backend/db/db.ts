@@ -472,8 +472,12 @@ export class DB {
   ): Customer[] => {
     const parsed = PaginationOptsSchema.parse(paginationOpts);
     let stmt = "SELECT * FROM customer";
+    if (typeof parsed.filter === "string")
+      stmt += " WHERE LOWER(name) LIKE LOWER('%' || @filter || '%')";
     if (typeof parsed.limit === "number") stmt += " LIMIT @limit";
-    if (typeof parsed.page === "number") stmt += " OFFSET @page";
+    if (typeof parsed.page === "number" && !parsed.filter)
+      stmt += " OFFSET @page";
+    console.log(stmt);
     return this.connection.prepare(stmt).all(parsed) as Customer[];
   };
 

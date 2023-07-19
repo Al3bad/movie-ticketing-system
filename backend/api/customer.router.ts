@@ -16,6 +16,11 @@ const routes: Backend.Route[] = [
         type: "integer",
         description: "number of customers in the response",
       },
+      {
+        name: "filter",
+        type: "string",
+        description: "filter customers by name",
+      },
     ],
     controller: controller.getCustomers,
   },
@@ -89,12 +94,12 @@ const routes: Backend.Route[] = [
         type: "string",
         description: "new email of the customer",
       },
-      {
-        name: "type",
-        type: "string",
-        description: "new type or current type of the customer",
-        required: true,
-      },
+      // {
+      //   name: "type",
+      //   type: "string",
+      //   description: "new type or current type of the customer",
+      //   required: true,
+      // },
       {
         name: "discountRate",
         type: "number",

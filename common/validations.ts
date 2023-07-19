@@ -3,6 +3,7 @@ import { z } from "zod";
 export const PaginationOptsSchema = z.object({
   page: z.coerce.number().positive().int().optional(),
   limit: z.coerce.number().positive().int().optional(),
+  filter: z.string().optional(),
 });
 
 export const GetMovieOptionsSchema = z.object({
