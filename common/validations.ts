@@ -110,27 +110,23 @@ export const NewCustomerSchema = z.union([
 
 export const UpdateCustomerSchema = z
   .object({
-    newEmail: z.string().email().nullish().default(null),
-    name: z.string().nullish().default(null),
-    type: z.literal("Normal"),
+    newEmail: z.string().email(),
+    name: z.string(),
+    discountRate: z.number().gt(0).lte(1),
+    threshold: z.number().positive(),
   })
-  .or(
-    z.object({
-      newEmail: z.string().email().nullish().default(null),
-      name: z.string().nullish().default(null),
-      type: z.literal("Flat"),
-      discountRate: z.number().gt(0).lte(1).nullish().default(null),
-    })
-  )
-  .or(
-    z.object({
-      newEmail: z.string().email().nullish().default(null),
-      name: z.string().nullish().default(null),
-      type: z.literal("Step"),
-      discountRate: z.number().gt(0).lte(1).nullish().default(null),
-      threshold: z.number().positive().nullish().default(null),
-    })
-  );
+  .partial()
+  .strict();
+
+export const UpdateCustomerDBSchema = z
+  .object({
+    newEmail: z.string().email(),
+    type: z.literal("Normal").or(z.literal("Flat")).or(z.literal("Step")),
+    name: z.string(),
+    discountRate: z.number().gt(0).lte(1),
+    threshold: z.number().positive(),
+  })
+  .partial();
 
 export const UpdateCustomersSchema = z
   .object({

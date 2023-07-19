@@ -79,12 +79,12 @@ const routes: Backend.Route[] = [
   {
     method: "put",
     endpoint: "/:email",
-    description: "Edit customer info",
+    description: "Edit customer info (email/name/discountRate/threshold)",
     parameters: [
       {
         name: "email",
         type: "string",
-        description: "email of the customer",
+        description: "current email of the customer",
         required: true,
       },
     ],

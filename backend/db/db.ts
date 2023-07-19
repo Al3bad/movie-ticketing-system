@@ -4,12 +4,13 @@ import {
   // NewTicketComponent,
   NewTicketSchema,
   // TicketSchema,
-  UpdateCustomerSchema,
+  // UpdateCustomerSchema,
   PaginationOptsSchema,
   NewBookingSchema,
   GetMovieOptionsSchema,
   UpdateMovieSchema,
   TicketComponentSchema,
+  UpdateCustomerDBSchema,
 } from "@/common/validations";
 import { faker } from "@faker-js/faker";
 import {
@@ -493,27 +494,36 @@ export class DB {
 
   updateCustomer = (
     customerEmail: string,
-    newCustoemrInfo: z.infer<typeof UpdateCustomerSchema>
+    newCustoemrInfo: z.infer<typeof UpdateCustomerDBSchema>
   ) => {
     // NOTE: as of now, customer cannot update their type
     const email = z.string().email().parse(customerEmail);
-    const newInfo = UpdateCustomerSchema.parse(newCustoemrInfo);
+    const newInfo = UpdateCustomerDBSchema.parse(newCustoemrInfo);
+
+    const fields: string[] = [];
+    (Object.keys(newInfo) as Array<keyof typeof newInfo>).forEach((field) => {
+      if (field === "newEmail") fields.push("email = @newEmail");
+      else if (field === "type") return;
+      else if (newInfo[field]) fields.push(`${field} = @${field}`);
+    });
+
+    // console.log("No fields to update!")
+    if (fields.length === 0) return undefined;
+
+    console.log(`UPDATE customer
+          SET ${fields.join(",")}
+          WHERE LOWER(email) = LOWER(@email)`);
+
     // update the remaining details
     const info = this.connection
       .prepare(
         `UPDATE customer
-          SET email = IFNULL(@newEmail, email),
-              name = IFNULL(@name, name),
-              type = IFNULL(@type, type),
-              discountRate = IFNULL(@discountRate, discountRate),
-              threshold = IFNULL(@threshold, threshold)
-          WHERE LOWER(email) = LOWER(@email);`
+          SET ${fields.join(",")}
+          WHERE LOWER(email) = LOWER(@email)`
       )
       .run({ email, ...newInfo });
 
-    if (info.changes === 0) {
-      return undefined;
-    }
+    if (info.changes === 0) return undefined;
 
     if (newInfo.type === "Flat" && newInfo.discountRate) {
       // update discountRate for all flat reward customers
