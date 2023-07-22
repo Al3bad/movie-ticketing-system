@@ -1,93 +1,92 @@
 import { useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import {
   fetchCustomerByEmail,
   updateCustomer,
 } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
 import Button from "../../UI/Button/Button";
+import { UpdateCustomerSchema } from "../../../../common/validations";
 
 const inputFields = [
   {
     label: "Customer Name",
-    type: "text",
     key: "name",
   },
   {
     label: "Customer Email",
-    type: "text",
     key: "email",
   },
   {
     label: "Customer Type",
-    type: "text",
     key: "type",
   },
   {
     label: "Discount Rate",
-    type: "number",
     key: "discountRate",
   },
   {
     label: "Threshold",
-    type: "number",
     key: "threshold",
   },
 ];
 
 const CustomerDetail = () => {
-  const [isEdit, setIsEdit] = useState(false);
   const customer = useLoaderData();
-
-  const updateCustomerHandler = async (email, data) => {
-    const response = await updateCustomer(email, data);
-    console.log(response);
-  };
+  const [updatedCustomer, setUpdatedCustomer] = useState(customer);
 
   const inputChangeHandler = (label, val) => {
-    console.log(label, val);
-    // setCustomer((currentInfo) => {
-    //   return { ...currentInfo, discountRate: +val };
-    // });
-  };
-
-  const editCustomerHandler = (label, e) => {
-    e.preventDefault();
-    if (!isEdit) {
-      setIsEdit(true);
-    } else {
-      setIsEdit(false);
-      console.log(customer);
-      const data = { ...customer };
-      delete data.name;
-      updateCustomerHandler(data.email, data);
-    }
+    setUpdatedCustomer((currentVal) => {
+      const fieldKey = inputFields.filter((field) => field.label === label);
+      return { ...currentVal, [fieldKey[0].key]: val };
+    });
   };
 
   return (
     <>
-      {customer && (
-        <form>
-          {inputFields.map((field, id) => {
-            return (
-              <Input
-                key={id}
-                isDisabled={field.key === "discountRate" ? !isEdit : true}
-                label={field.label}
-                type={field.type}
-                onChange={inputChangeHandler}
-                value={customer[field.key]}
-              />
-            );
-          })}
-          <Button
-            label={!isEdit ? "Edit" : "Save"}
-            type="button"
-            onClick={editCustomerHandler}
-            classLabels={["primary"]}
+      <Form method="put">
+        <Input
+          label="Customer Name"
+          type="text"
+          name="name"
+          onChange={inputChangeHandler}
+          value={updatedCustomer.name}
+        />
+        <Input
+          label="Customer Email"
+          type="email"
+          onChange={inputChangeHandler}
+          name="email"
+          value={updatedCustomer.email}
+        />
+        <Input
+          label="Customer Type"
+          type="text"
+          isDisabled={true}
+          onChange={inputChangeHandler}
+          name="type"
+          value={updatedCustomer.type}
+        />
+        {updatedCustomer.discountRate && (
+          <Input
+            label="Discount Rate"
+            type="number"
+            onChange={inputChangeHandler}
+            name="discountRate"
+            value={updatedCustomer.discountRate}
           />
-        </form>
-      )}
+        )}
+        {updatedCustomer.threshold && (
+          <Input
+            label="Threshold"
+            type="number"
+            onChange={inputChangeHandler}
+            name="threshold"
+            value={updatedCustomer.threshold}
+          />
+        )}
+        <Button label="Update" type="submit" classLabels={["primary"]} />
+      </Form>
     </>
   );
 };
@@ -101,4 +100,35 @@ export const customerDetailLoader = async ({ request }) => {
     const customer = await fetchCustomerByEmail(email);
     return customer;
   }
+};
+
+export const customerDetailAction = async ({ request, params }) => {
+  const formInput = await request.formData();
+  const url = new URL(request.url);
+  const currentEmail = url.searchParams.get("id");
+
+  const discountRate = formInput.get("discountRate");
+  const threshold = formInput.get("threshold");
+
+  let data = {
+    name: formInput.get("name"),
+    newEmail: formInput.get("email"),
+  };
+
+  if (discountRate) {
+    data = { ...data, discountRate: +discountRate };
+  }
+
+  if (threshold) {
+    data = { ...data, threshold: +threshold };
+  }
+
+  // validate form input
+  const validateResult = UpdateCustomerSchema.safeParse(data);
+  console.log(validateResult);
+  if (currentEmail) {
+    const response = await updateCustomer(currentEmail, data);
+    console.log(response);
+  }
+  return data;
 };

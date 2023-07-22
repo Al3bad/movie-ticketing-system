@@ -1,6 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import PurchaseTickets from "./components/pages/PurchaseTickets/PurchaseTickets";
+import PurchaseTickets, {
+  purchaseTicketLoader,
+} from "./components/pages/PurchaseTickets/PurchaseTickets";
 import TicketList, {
   ticketListLoader,
 } from "./components/pages/TicketList/TicketList";
@@ -14,6 +16,7 @@ import CustomerList, {
   customerListLoader,
 } from "./components/pages/CustomerList/CustomerList";
 import CustomerDetail, {
+  customerDetailAction,
   customerDetailLoader,
 } from "./components/pages/CustomerDetail/CustomerDetail";
 import TicketDetail, {
@@ -38,7 +41,11 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       { index: true, element: <Dashboard /> },
-      { path: "purchase-tickets", element: <PurchaseTickets /> },
+      {
+        path: "purchase-tickets",
+        element: <PurchaseTickets />,
+        loader: purchaseTicketLoader,
+      },
       {
         path: "customers",
         element: <CustomerList />,
@@ -51,6 +58,7 @@ const router = createBrowserRouter([
         path: "customer",
         element: <CustomerDetail />,
         loader: customerDetailLoader,
+        action: customerDetailAction,
       },
       { path: "ticket", element: <TicketDetail />, loader: ticketDetailLoader },
       { path: "movie", element: <MovieDetail />, loader: movieDetailLoader },

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-
+import { useState } from "react";
+import { useLoaderData, useNavigation } from "react-router-dom";
 import styles from "./PurchaseTickets.module.css";
 import Button from "../../UI/Button/Button";
 import Dropdown from "../../UI/Dropdown/Dropdown";
@@ -17,7 +17,7 @@ import { NewBookingSchema } from "../../../../common/validations";
 
 type Data = {
   movies: Movie[];
-  ticketTypes: NewTicket[];
+  ticketTypes: Ticket[];
   "customer-name": string;
   "customer-type": string;
   "customer-email-input": string;
@@ -39,10 +39,13 @@ const PurchaseTickets = () => {
     },
   ];
   //----
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+  const data = useLoaderData();
 
   const initialData = {
-    movies: [],
-    ticketTypes: [],
+    movies: data.movies,
+    ticketTypes: data.ticketTypes,
     "customer-name": "",
     "customer-type": "",
     "customer-email-input": "",
@@ -50,64 +53,21 @@ const PurchaseTickets = () => {
     selectedTickets: [{ type: "", qty: 0 }],
   };
 
-  const [data, setData] = useState<Data>(initialData);
+  const [formInput, setFormInput] = useState<Data>(initialData);
   const [isCustomerFetched, setIsCustomerFetched] = useState(false);
   const [ticketInputIds, setTicketInputIds] = useState([0]);
   const [msg, setMsg] = useState<Msg>();
 
-  useEffect(() => {
-    // Fetch Movies on Page Load
-    fetchMovieHandler();
-
-    // Fetch Ticket Types on Page Load
-    fetchTicketHandler();
-  }, []);
-
-  const fetchMovieHandler = async () => {
-    const movies = await fetchMovies();
-    if (movies) {
-      // console.log("movies", movies);
-      const movieOptions = movies.map((movie: Movie) => {
-        return { ...movies, id: movie.title, value: movie.title };
-      });
-      setData((currentData) => {
-        return {
-          ...currentData,
-          movies: movieOptions,
-        };
-      });
-    }
-  };
-
-  const fetchTicketHandler = async () => {
-    const tickets = await fetchTickets();
-    if (tickets) {
-      // console.log("tickets", tickets);
-      const ticketOptions = tickets.map((ticket: NewTicket) => {
-        return {
-          ...ticket,
-          id: ticket.type,
-          value: ticket.type,
-        };
-      });
-      setData((currentData) => {
-        return {
-          ...currentData,
-          ticketTypes: ticketOptions,
-        };
-      });
-    }
-  };
-
   // TO DO: Check customer response in the case of new customer
   const fetchCustomerHandler = async () => {
-    // TO DO: move this line after receiving response from backend
     setIsCustomerFetched(true);
-    if (data["customer-email-input"]) {
-      const customer = await fetchCustomerByEmail(data["customer-email-input"]);
+    if (formInput["customer-email-input"]) {
+      const customer = await fetchCustomerByEmail(
+        formInput["customer-email-input"]
+      );
       if (customer) {
         // TO DO: transform data based on reponse from Backend before setCustomer
-        setData((currentVals) => {
+        setFormInput((currentVals) => {
           return {
             ...currentVals,
             customer: customer,
@@ -116,12 +76,11 @@ const PurchaseTickets = () => {
       }
     }
   };
-
   const inputChangeHandler = (label: string, val: string, id = -1) => {
     label = label.toLocaleLowerCase().split(" ").join("-");
     switch (label) {
       case "tickets-option":
-        return setData((currentVals) => {
+        return setFormInput((currentVals) => {
           const currentTickets = [...currentVals.selectedTickets];
           if (id >= 0) {
             currentTickets[id].type = val;
@@ -133,11 +92,10 @@ const PurchaseTickets = () => {
           return currentVals;
         });
       case "tickets-input":
-        return setData((currentVals) => {
+        return setFormInput((currentVals) => {
           const currentTickets = [...currentVals.selectedTickets];
           if (id >= 0) {
             currentTickets[id].qty = +val;
-            console.log(currentTickets);
             return {
               ...currentVals,
               selectedTickets: currentTickets,
@@ -146,7 +104,7 @@ const PurchaseTickets = () => {
           return currentVals;
         });
       default:
-        return setData((currentVals) => {
+        return setFormInput((currentVals) => {
           return {
             ...currentVals,
             [label]: val,
@@ -157,7 +115,7 @@ const PurchaseTickets = () => {
 
   const addNewTicketsHandler = () => {
     setTicketInputIds((currentIds) => [...currentIds, currentIds.length]);
-    setData((currentVals) => {
+    setFormInput((currentVals) => {
       const currentSelectedTickets = currentVals.selectedTickets;
       return {
         ...currentVals,
@@ -171,12 +129,12 @@ const PurchaseTickets = () => {
     // TO DO: Add funtionality to purchase ticket
     const newBooking = {
       customer: {
-        name: data["customer-name"],
-        email: data["customer-email-input"],
-        type: data["customer-type"],
+        name: formInput["customer-name"],
+        email: formInput["customer-email-input"],
+        type: formInput["customer-type"],
       },
-      movie: data.movie,
-      tickets: data.selectedTickets.filter(
+      title: formInput.movie,
+      tickets: formInput.selectedTickets.filter(
         (ticket) => ticket.type !== "" && ticket.qty !== 0 // Remove invalid ticket inputs
       ),
     };
@@ -299,3 +257,42 @@ const PurchaseTickets = () => {
 };
 
 export default PurchaseTickets;
+
+export const purchaseTicketLoader = async () => {
+  let data = {
+    movies: [],
+    ticketTypes: [],
+  };
+
+  // fetch movies
+  const movies = await fetchMovies();
+  if (movies) {
+    // console.log("movies", movies);
+    const movieOptions = movies.map((movie: Movie) => {
+      return { ...movies, id: movie.title, value: movie.title };
+    });
+    data = {
+      ...data,
+      movies: movieOptions,
+    };
+  }
+
+  // fetch tickets
+  const tickets = await fetchTickets();
+  if (tickets) {
+    // console.log("tickets", tickets);
+    const ticketOptions = tickets.map((ticket: NewTicket) => {
+      return {
+        ...ticket,
+        id: ticket.type,
+        value: ticket.type,
+      };
+    });
+    data = {
+      ...data,
+      ticketTypes: ticketOptions,
+    };
+  }
+
+  return data;
+};
