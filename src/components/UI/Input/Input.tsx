@@ -6,20 +6,21 @@ type InputProps = {
   classLabel?: string;
   isDisabled?: boolean;
   type?: string;
-  value?: any;
+  name?: string;
+  value?: string | number;
   onChange: (name: string, val: string | number) => void;
 };
 
 const Input: React.FC<InputProps> = ({
   label,
   classLabel,
-  isDisabled = false,
   type = "text",
+  isDisabled = false,
+  name,
   value,
   onChange,
 }) => {
   const inputChangeHandler = (e) => {
-    //console.log(e.target.value);
     onChange(label, e.target.value);
   };
   return (
@@ -33,6 +34,7 @@ const Input: React.FC<InputProps> = ({
         type={type}
         onChange={inputChangeHandler}
         disabled={isDisabled}
+        name={name}
         value={value}
       />
     </div>
