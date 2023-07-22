@@ -23,6 +23,7 @@ export const cors = (_: Request, res: Response, next: NextFunction) => {
       "POST",
       "PUT",
       "DELETE",
+      "OPTIONS",
     ]);
     res.header("Access-Control-Allow-Headers", ["Content-Type"]);
   }
