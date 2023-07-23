@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useLoaderData, redirect } from "react-router-dom";
 import {
   fetchCustomerByEmail,
   updateCustomer,
@@ -9,26 +9,11 @@ import Button from "../../UI/Button/Button";
 import { UpdateCustomerSchema } from "../../../../common/validations";
 
 const inputFields = [
-  {
-    label: "Customer Name",
-    key: "name",
-  },
-  {
-    label: "Customer Email",
-    key: "email",
-  },
-  {
-    label: "Customer Type",
-    key: "type",
-  },
-  {
-    label: "Discount Rate",
-    key: "discountRate",
-  },
-  {
-    label: "Threshold",
-    key: "threshold",
-  },
+  { label: "Customer Name", key: "name" },
+  { label: "Customer Email", key: "email" },
+  { label: "Customer Type", key: "type" },
+  { label: "Discount Rate", key: "discountRate" },
+  { label: "Threshold", key: "threshold" },
 ];
 
 const CustomerDetail = () => {
@@ -125,10 +110,17 @@ export const customerDetailAction = async ({ request, params }) => {
 
   // validate form input
   const validateResult = UpdateCustomerSchema.safeParse(data);
-  console.log(validateResult);
-  if (currentEmail) {
-    const response = await updateCustomer(currentEmail, data);
-    console.log(response);
+  if (validateResult.success && currentEmail) {
+    try {
+      const response = await updateCustomer(currentEmail, data);
+      if (response) {
+        return redirect("/customers");
+      } else {
+        console.log(response);
+      }
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
   }
-  return data;
 };

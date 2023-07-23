@@ -1,4 +1,5 @@
 import { BASE_API_ENDPOINT } from "./constants";
+import { UpdateMovie } from "../../common/validations";
 
 const getHTTPHeader = (method: string) => {
   const header = {
@@ -87,12 +88,10 @@ export const fetchCustomers = async () => {
 export const updateCustomer = async (email: string, updatedInfo) => {
   const customer_endpoint = `${BASE_API_ENDPOINT}/customer/${email}`;
   try {
-    const data = {
+    const response = await httpFetch(customer_endpoint, {
       ...getHTTPHeader("put"),
       body: JSON.stringify(updatedInfo),
-    };
-    console.log(data);
-    const response = await httpFetch(customer_endpoint, data);
+    });
     return response.json();
   } catch (err) {
     errorHandler(err);
@@ -103,6 +102,19 @@ export const fetchMovies = async () => {
   const movies_endpoint = `${BASE_API_ENDPOINT}/movie/`;
   try {
     const response = await httpFetch(movies_endpoint);
+    return response.json();
+  } catch (err) {
+    errorHandler(err);
+  }
+};
+
+export const updateMovie = async (title: string, data: UpdateMovie) => {
+  const movies_endpoint = `${BASE_API_ENDPOINT}/movie/${title}`;
+  try {
+    const response = await httpFetch(movies_endpoint, {
+      ...getHTTPHeader("put"),
+      body: JSON.stringify(data),
+    });
     return response.json();
   } catch (err) {
     errorHandler(err);
