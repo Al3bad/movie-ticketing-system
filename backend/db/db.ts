@@ -15,6 +15,7 @@ import {
 import { faker } from "@faker-js/faker";
 import {
   InvalidTicketComponentError,
+  NotFoundResourceError,
   SeatsRangeError,
 } from "backend/lib/errors";
 import SQLite3, { Database, SqliteError } from "better-sqlite3";
@@ -173,13 +174,14 @@ export class DB {
     });
 
     this.insertBooking({
-      customer: {
-        name: customers[0].name,
-        email: customers[0].email,
-        type: customers[0].type,
-        discountRate: customers[0].discountRate || 0,
-        threshold: customers[0].threshold,
-      },
+      email: customers[0].email,
+      // customer: {
+      //   name: customers[0].name,
+      //   email: customers[0].email,
+      //   type: customers[0].type,
+      //   discountRate: customers[0].discountRate || 0,
+      //   threshold: customers[0].threshold,
+      // },
       title: movies.find((mv) => mv.seatAvailable > 5)?.title || "Test",
       tickets: [
         { type: "adult", qty: 1 },
@@ -575,11 +577,16 @@ export class DB {
   };
 
   insertBooking = (newBooking: z.infer<typeof NewBookingSchema>) => {
-    const { customer, title, tickets } = NewBookingSchema.parse(newBooking);
+    const { email, title, tickets } = NewBookingSchema.parse(newBooking);
     // Start a inTransaction
     this.connection.prepare("BEGIN").run();
     // Create new customer, if not exists
-    this.insertCustomer(customer);
+    const customer = this.getCustomerByEmail(email);
+    if (!customer)
+      throw new NotFoundResourceError(
+        `Customer with "${email}" email doesn't exist!`,
+        "customer"
+      );
     const booking: { id?: number | bigint } = {};
     // Insert into booking table
     booking.id = this.connection
@@ -590,7 +597,7 @@ export class DB {
         customer.email,
         title,
         customer.discountRate,
-        customer.threshold
+        (customer as StepCustomer).threshold || null
       ).lastInsertRowid;
     // Update movies
     this.updateSeats({

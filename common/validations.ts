@@ -150,15 +150,16 @@ export const UpdateCustomersSchema = z
 // ==============================================
 
 export const NewBookingSchema = z.object({
-  customer: z.union([
-    NormalCustomerSchema.extend({
-      threshold: z.literal(null).nullish().default(null),
-    }),
-    FlatCustomerSchema.extend({
-      threshold: z.literal(null).nullish().default(null),
-    }),
-    StepCustomerSchema,
-  ]),
+  // customer: z.union([
+  //   NormalCustomerSchema.extend({
+  //     threshold: z.literal(null).nullish().default(null),
+  //   }),
+  //   FlatCustomerSchema.extend({
+  //     threshold: z.literal(null).nullish().default(null),
+  //   }),
+  //   StepCustomerSchema,
+  // ]),
+  email: z.string().email(),
   title: z.string(),
   tickets: z.array(RequestedTicket).min(1),
 });
