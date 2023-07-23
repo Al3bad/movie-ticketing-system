@@ -7,8 +7,14 @@ export const PaginationOptsSchema = z.object({
 });
 
 export const GetMovieOptionsSchema = z.object({
-  onlyReleased: z.boolean().optional().default(true),
-  includeIsReleased: z.boolean().optional().default(false),
+  onlyReleased: z
+    .union([z.boolean(), z.literal("true"), z.literal("false")])
+    .transform((val) => (typeof val === "boolean" ? val : val === "true"))
+    .optional(),
+  includeIsReleased: z
+    .union([z.boolean(), z.literal("true"), z.literal("false")])
+    .transform((val) => (typeof val === "boolean" ? val : val === "true"))
+    .optional(),
 });
 
 // ==============================================

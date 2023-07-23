@@ -257,9 +257,9 @@ export class DB {
       .prepare(
         `SELECT title, seatAvailable ${
           includeIsReleased ? ", isReleased" : ""
-        } FROM movie WHERE isReleased = ?`
+        } FROM movie ${onlyReleased ? "WHERE isReleased = 1" : ""}`
       )
-      .all(onlyReleased ? 1 : 0);
+      .all();
   };
 
   getMovieByTitle = (
@@ -275,9 +275,11 @@ export class DB {
       .prepare(
         `SELECT title, seatAvailable ${
           includeIsReleased ? ", isReleased" : ""
-        } FROM movie WHERE LOWER(title) = LOWER(?) AND isReleased = ?`
+        } FROM movie WHERE LOWER(title) = LOWER(?) ${
+          onlyReleased ? "AND isReleased = 1" : ""
+        }`
       )
-      .get(z.string().nonempty().parse(title), onlyReleased ? 1 : 0) as Movie;
+      .get(z.string().nonempty().parse(title)) as Movie;
   };
 
   updateSeats = (requestedSeats: RequestedSeats) => {
