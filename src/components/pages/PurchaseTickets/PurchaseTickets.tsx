@@ -93,8 +93,8 @@ const PurchaseTickets = () => {
     });
   };
 
-  const purchaseTicketHandler = async (e: FormEvent) => {
-    e.preventDefault();
+  const purchaseTicketHandler = async (event: React.FormEvent) => {
+    event.preventDefault();
     const newBooking = {
       email: formInput.email,
       title: formInput.movie,
