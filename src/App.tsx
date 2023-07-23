@@ -26,6 +26,7 @@ import MovieList, {
   movieListLoader,
 } from "./components/pages/MovieList/MovieList";
 import MovieDetail, {
+  movieDetailAction,
   movieDetailLoader,
 } from "./components/pages/MovieDetail/MovieDetail";
 import Root from "./components/UI/Root/Root";
@@ -61,7 +62,12 @@ const router = createBrowserRouter([
         action: customerDetailAction,
       },
       { path: "ticket", element: <TicketDetail />, loader: ticketDetailLoader },
-      { path: "movie", element: <MovieDetail />, loader: movieDetailLoader },
+      {
+        path: "movie",
+        element: <MovieDetail />,
+        loader: movieDetailLoader,
+        action: movieDetailAction,
+      },
       {
         path: "booking",
         element: <BookingDetail />,

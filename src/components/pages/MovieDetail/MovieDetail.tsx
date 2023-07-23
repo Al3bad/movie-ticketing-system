@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useLoaderData } from "react-router-dom";
-import { fetchMovieByTitle } from "../../../utils/http-requests";
+import { Form, useLoaderData, redirect } from "react-router-dom";
+import { fetchMovieByTitle, updateMovie } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
 import Button from "../../UI/Button/Button";
+import { UpdateMovieSchema } from "../../../../common/validations";
 
 const inputFields = [
   {
@@ -19,40 +20,39 @@ const inputFields = [
 
 const MovieDetail = () => {
   const movie = useLoaderData();
-  const [isEdit, setIsEdit] = useState(false);
+  const [updatedMovie, setUpdatedMovie] = useState(movie);
 
-  const inputChangeHandler = (e) => {
-    console.log(e);
-  };
-
-  const editMovieHandler = () => {
-    // Toggle the current edit state
-    setIsEdit((currentState) => !currentState);
+  const inputChangeHandler = (label, val) => {
+    const fieldKey = inputFields.filter((field) => field.label === label);
+    console.log(label, val);
+    console.log(fieldKey);
+    setUpdatedMovie((currentVal) => {
+      return {
+        ...currentVal,
+        [fieldKey[0].key]: val,
+      };
+    });
   };
 
   return (
     <>
       {movie && (
-        <form>
+        <Form method="put">
           {inputFields.map((field, id) => {
             return (
               <Input
                 key={id}
-                isDisabled={!isEdit}
                 label={field.label}
+                isDisabled={field.key === "seatAvailable" ? true : false}
                 type={field.type}
+                name={field.key}
                 onChange={inputChangeHandler}
-                value={movie[field.key]}
+                value={updatedMovie[field.key]}
               />
             );
           })}
-          {/* <Button
-            label={!isEdit ? "Edit" : "Save"}
-            type="button"
-            onClick={editMovieHandler}
-            classLabels={["primary"]}
-          /> */}
-        </form>
+          <Button label="Update" type="submit" classLabels={["primary"]} />
+        </Form>
       )}
     </>
   );
@@ -66,5 +66,28 @@ export const movieDetailLoader = async ({ request }) => {
   if (title) {
     const fetchedMovie = await fetchMovieByTitle(title);
     return fetchedMovie;
+  }
+};
+
+export const movieDetailAction = async ({ request }) => {
+  const url = new URL(request.url);
+  const title = url.searchParams.get("id");
+  const formInput = await request.formData();
+  const data = {
+    title: formInput.get("title"),
+  };
+  // Validate data
+  const validateResult = UpdateMovieSchema.safeParse(data);
+  if (validateResult.success && title) {
+    try {
+      const response = await updateMovie(title, data);
+      if (response) {
+        return redirect("/movies");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    return validateResult;
   }
 };
