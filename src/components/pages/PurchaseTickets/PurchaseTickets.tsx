@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLoaderData, useNavigation } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { useLoaderData, useNavigation, useNavigate } from "react-router-dom";
 import styles from "./PurchaseTickets.module.css";
 import Button from "../../UI/Button/Button";
 import Dropdown from "../../UI/Dropdown/Dropdown";
@@ -8,7 +8,6 @@ import Input from "../../UI/Input/Input";
 import Message from "../../UI/Message/Message";
 import Icon from "../../UI/Icon/Icon";
 import {
-  fetchCustomerByEmail,
   fetchMovies,
   fetchTickets,
   submitBooking,
@@ -18,9 +17,7 @@ import { NewBookingSchema } from "../../../../common/validations";
 type Data = {
   movies: Movie[];
   ticketTypes: Ticket[];
-  "customer-name": string;
-  "customer-type": string;
-  "customer-email-input": string;
+  email: string;
   movie: string;
   selectedTickets: Ticket[];
 };
@@ -32,15 +29,14 @@ type Msg = {
 
 const PurchaseTickets = () => {
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const isLoading = navigation.state === "loading";
   const data = useLoaderData();
 
   const initialData = {
     movies: data.movies,
     ticketTypes: data.ticketTypes,
-    "customer-name": "",
-    "customer-type": "",
-    "customer-email-input": "",
+    email: "",
     movie: "",
     selectedTickets: [{ type: "", qty: 0 }],
   };
@@ -97,15 +93,10 @@ const PurchaseTickets = () => {
     });
   };
 
-  const purchaseTicketHandler = (event: React.FormEvent) => {
+  const purchaseTicketHandler = async (event: React.FormEvent) => {
     event.preventDefault();
-    // TO DO: Add funtionality to purchase ticket
     const newBooking = {
-      customer: {
-        name: formInput["customer-name"],
-        email: formInput["customer-email-input"],
-        type: formInput["customer-type"],
-      },
+      email: formInput.email,
       title: formInput.movie,
       tickets: formInput.selectedTickets.filter(
         (ticket) => ticket.type !== "" && ticket.qty !== 0 // Remove invalid ticket inputs
@@ -119,21 +110,23 @@ const PurchaseTickets = () => {
 
     if (result.success) {
       // send data to the backend
-      submitBooking(newBooking)
-        .then((response) => console.log("success", response))
-        .catch((error) => console.log("error", error));
+      const response = await submitBooking(newBooking);
+      console.log(response);
+      if (response && response.id) {
+        return navigate(`/booking?id=${response.id}`);
+      } else {
+        setMsg({
+          type: "error",
+          text: response.error.msg,
+        });
+      }
     } else {
       // display errors on the form
-      let msg = "Invalid inputs for: ";
-      result.error.issues.forEach((error, idx) => {
-        console.log(error.path, error.message);
-        if (idx !== result.error.issues.length - 1) {
-          msg += error.path[0] + ", ";
-        } else {
-          msg += error.path[0];
-        }
+      setMsg({
+        type: "error",
+        text: result.error.msg,
       });
-      setMsg({ type: "error", text: msg });
+      return result.error;
     }
   };
 
@@ -146,33 +139,31 @@ const PurchaseTickets = () => {
 
         <form onSubmit={purchaseTicketHandler}>
           <Input
-            label="Customer Email"
+            label="Email"
             type="email"
-            id="customer-email"
+            id="email"
             onChange={inputChangeHandler}
+            value={formInput.email}
+            name="email"
           />
-
-          {/* 
-          TO DO: 
-            Fetch Movies from Backend,
-            Replace DUMMY data 
-          */}
           <Dropdown
             label="Movie"
             id="movie"
             options={data.movies}
             onChange={inputChangeHandler}
             value={formInput.movie}
+            name="movie"
           />
-
           <p>Tickets</p>
           {/* Dynamically generate a list of ticket inputs */}
+
           {ticketInputIds.map((id) => {
             return (
               <MultipleInputs
                 key={id}
                 label="Tickets"
                 id="tickets"
+                name="tickets"
                 hide_label={true}
                 options={data.ticketTypes}
                 type="dropdown-w-input"
