@@ -1,5 +1,4 @@
 import { BASE_API_ENDPOINT } from "./constants";
-import { UpdateMovie } from "../../common/validations";
 
 const getHTTPHeader = (method: string) => {
   const header = {
@@ -108,7 +107,7 @@ export const fetchMovies = async () => {
   }
 };
 
-export const updateMovie = async (title: string, data: UpdateMovie) => {
+export const updateMovie = async (title: string, data) => {
   const movies_endpoint = `${BASE_API_ENDPOINT}/movie/${title}`;
   try {
     const response = await httpFetch(movies_endpoint, {
@@ -122,9 +121,10 @@ export const updateMovie = async (title: string, data: UpdateMovie) => {
 };
 
 export const fetchMovieByTitle = async (title: string) => {
-  const movies_endpoint = `${BASE_API_ENDPOINT}/movie/${title}`;
+  const movies_endpoint = `${BASE_API_ENDPOINT}/movie/${title}?includeIsReleased=true`;
+  const encoded_endpoint = encodeURI(movies_endpoint);
   try {
-    const response = await httpFetch(movies_endpoint);
+    const response = await httpFetch(encoded_endpoint);
     return response.json();
   } catch (err) {
     errorHandler(err);

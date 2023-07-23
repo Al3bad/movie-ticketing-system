@@ -11,6 +11,7 @@ type DropdownProps = {
   options: Option[];
   isDisabled?: boolean;
   value?: string;
+  name?: string;
   onChange: (name: string, val: string | number) => void;
 };
 
@@ -20,6 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   options,
   isDisabled = false,
   value = undefined,
+  name,
   onChange,
 }) => {
   const dropdownHandler = (e) => {
@@ -34,9 +36,9 @@ const Dropdown: React.FC<DropdownProps> = ({
       {!classLabel?.includes("multi-inputs") && <label>{label}</label>}
       <select
         onChange={dropdownHandler}
-        defaultValue={"DEFAULT"}
         disabled={isDisabled}
-        value={value}
+        value={value ? value : "DEFAULT"}
+        name={name}
       >
         <option value="DEFAULT" disabled>
           Select an option...

@@ -3,6 +3,7 @@ import { Form, useLoaderData, redirect } from "react-router-dom";
 import { fetchMovieByTitle, updateMovie } from "../../../utils/http-requests";
 import Input from "../../UI/Input/Input";
 import Button from "../../UI/Button/Button";
+import Dropdown from "../../UI/Dropdown/Dropdown";
 import { UpdateMovieSchema } from "../../../../common/validations";
 
 const inputFields = [
@@ -15,6 +16,11 @@ const inputFields = [
     label: "Seat Available",
     key: "seatAvailable",
     type: "number",
+  },
+  {
+    label: "Is Released",
+    key: "isReleased",
+    type: "string",
   },
 ];
 
@@ -39,17 +45,35 @@ const MovieDetail = () => {
       {movie && (
         <Form method="put">
           {inputFields.map((field, id) => {
-            return (
-              <Input
-                key={id}
-                label={field.label}
-                isDisabled={field.key === "seatAvailable" ? true : false}
-                type={field.type}
-                name={field.key}
-                onChange={inputChangeHandler}
-                value={updatedMovie[field.key]}
-              />
-            );
+            if (field.key === "isReleased") {
+              const options = [
+                { id: 0, value: "False" },
+                { id: 1, value: "True" },
+              ];
+              return (
+                <Dropdown
+                  key={id}
+                  label={field.label}
+                  isDisabled={false}
+                  name={field.key}
+                  onChange={inputChangeHandler}
+                  value={updatedMovie[field.key] === 1 ? "True" : "False"}
+                  options={options}
+                />
+              );
+            } else {
+              return (
+                <Input
+                  key={id}
+                  label={field.label}
+                  isDisabled={field.key === "seatAvailable" ? true : false}
+                  type={field.type}
+                  name={field.key}
+                  onChange={inputChangeHandler}
+                  value={updatedMovie[field.key]}
+                />
+              );
+            }
           })}
           <Button label="Update" type="submit" classLabels={["primary"]} />
         </Form>
@@ -75,6 +99,7 @@ export const movieDetailAction = async ({ request }) => {
   const formInput = await request.formData();
   const data = {
     title: formInput.get("title"),
+    isReleased: formInput.get("isReleased") === "True" ? 1 : 0,
   };
   // Validate data
   const validateResult = UpdateMovieSchema.safeParse(data);

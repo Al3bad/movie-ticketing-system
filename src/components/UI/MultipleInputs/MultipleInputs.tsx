@@ -10,6 +10,7 @@ type MultipleInputsProps = {
   label: string;
   hide_label: boolean;
   options?: Movie[] | Ticket[];
+  value?: string;
   onChange?: (label: string, val: string | number) => void;
   onClick?: () => void;
 };
@@ -18,6 +19,7 @@ const MultipleInputs: React.FC<MultipleInputsProps> = ({
   label,
   hide_label = false,
   options,
+  value,
   onChange,
   onClick,
 }) => {
@@ -52,6 +54,7 @@ const MultipleInputs: React.FC<MultipleInputsProps> = ({
             label={label}
             classLabel="multi-inputs-l"
             onChange={dropdownHandler}
+            value={value}
           />
         </div>
         <div
