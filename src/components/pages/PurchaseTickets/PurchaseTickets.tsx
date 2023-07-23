@@ -31,14 +31,6 @@ type Msg = {
 };
 
 const PurchaseTickets = () => {
-  // TO DO: NEED TO REMOVE ONCE BACKEND IS READY
-  const DUMMY_CUSTOMER_TYPES = [
-    {
-      id: 1,
-      value: "Normal",
-    },
-  ];
-  //----
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
   const data = useLoaderData();
@@ -54,28 +46,9 @@ const PurchaseTickets = () => {
   };
 
   const [formInput, setFormInput] = useState<Data>(initialData);
-  const [isCustomerFetched, setIsCustomerFetched] = useState(false);
   const [ticketInputIds, setTicketInputIds] = useState([0]);
   const [msg, setMsg] = useState<Msg>();
 
-  // TO DO: Check customer response in the case of new customer
-  const fetchCustomerHandler = async () => {
-    setIsCustomerFetched(true);
-    if (formInput["customer-email-input"]) {
-      const customer = await fetchCustomerByEmail(
-        formInput["customer-email-input"]
-      );
-      if (customer) {
-        // TO DO: transform data based on reponse from Backend before setCustomer
-        setFormInput((currentVals) => {
-          return {
-            ...currentVals,
-            customer: customer,
-          };
-        });
-      }
-    }
-  };
   const inputChangeHandler = (label: string, val: string, id = -1) => {
     label = label.toLocaleLowerCase().split(" ").join("-");
     switch (label) {
@@ -172,43 +145,12 @@ const PurchaseTickets = () => {
         {msg && <Message msg={msg.text} type={msg.type} />}
 
         <form onSubmit={purchaseTicketHandler}>
-          <MultipleInputs
+          <Input
             label="Customer Email"
-            type="input-w-btn"
+            type="email"
             id="customer-email"
-            onClick={fetchCustomerHandler}
             onChange={inputChangeHandler}
           />
-
-          {/* Display Customer name and type only when customer info is fetched */}
-          {isCustomerFetched && (
-            <>
-              {/* 
-              TO DO: 
-                Fetch Customer Name from Backend, 
-                Set disabled state based on customer response info 
-              */}
-              <Input
-                label="Customer Name"
-                type="text"
-                id="customer-name"
-                onChange={inputChangeHandler}
-              />
-
-              {/* 
-              TO DO: 
-                Fetch Customer Types from Backend, 
-                Replace DUMMY data,
-                Set disabled state based on customer response info 
-              */}
-              <Dropdown
-                label="Customer Type"
-                id="customer-type"
-                options={DUMMY_CUSTOMER_TYPES}
-                onChange={inputChangeHandler}
-              />
-            </>
-          )}
 
           {/* 
           TO DO: 
@@ -220,23 +162,27 @@ const PurchaseTickets = () => {
             id="movie"
             options={data.movies}
             onChange={inputChangeHandler}
+            value={formInput.movie}
           />
 
           <p>Tickets</p>
           {/* Dynamically generate a list of ticket inputs */}
-          {ticketInputIds.map((id) => (
-            <MultipleInputs
-              key={id}
-              label="Tickets"
-              id="tickets"
-              hide_label={true}
-              options={data.ticketTypes}
-              type="dropdown-w-input"
-              onChange={(label: string, val: string) =>
-                inputChangeHandler(label, val, id)
-              }
-            />
-          ))}
+          {ticketInputIds.map((id) => {
+            return (
+              <MultipleInputs
+                key={id}
+                label="Tickets"
+                id="tickets"
+                hide_label={true}
+                options={data.ticketTypes}
+                type="dropdown-w-input"
+                onChange={(label: string, val: string) =>
+                  inputChangeHandler(label, val, id)
+                }
+                value={formInput.selectedTickets[id].type}
+              />
+            );
+          })}
 
           <Button
             type="button"
